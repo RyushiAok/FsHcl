@@ -33,7 +33,7 @@ jobs:
         run: dotnet test tests/FsHcl.Tests.fsproj --configuration Release --no-restore
 
       - name: Pack
-        run: dotnet pack FsHcl.fsproj --configuration Release --no-restore --output artifacts /p:PackageVersion=${{ steps.version.outputs.version }}
+        run: dotnet pack FsHcl.fsproj --configuration Release --no-restore --output artifacts /p:Version=${{ steps.version.outputs.version }}
 
       - name: NuGet login
         uses: NuGet/login@v1
