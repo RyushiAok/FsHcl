@@ -10,6 +10,7 @@
     <Description>A small typed HCL generation DSL for F#.</Description>
     <PackageTags>fsharp;hcl;terraform;dsl</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
