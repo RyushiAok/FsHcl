@@ -2,7 +2,8 @@ namespace FsHcl
 
 /// Terraform syntax helpers layered on the generic HCL DSL.
 module TerraformHcl =
-    open Hcl
+    open FsHcl.Hcl.Syntax
+    open FsHcl.Hcl.Values
 
     /// Creates a Terraform `terraform` block.
     let terraform = block "terraform"

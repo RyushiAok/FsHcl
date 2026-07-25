@@ -1,0 +1,118 @@
+namespace FsHcl.Hcl
+
+open System
+open FsHcl.Hcl.Values
+
+/// HCL rendering functions.
+module Render =
+    /// Default Terraform-style rendering options.
+    let defaults = {
+        indentSize = 2
+        alignAttributes = true
+        trailingNewline = true
+    }
+
+    let private padding width = String.replicate width " "
+
+    let private maxKeyWidth nodes =
+        nodes
+        |> List.choose (function
+            | Attribute(key, _) -> Some key.Length
+            | _ -> None)
+        |> function
+            | [] -> 0
+            | widths -> List.max widths
+
+    let rec private renderFields options indent fields =
+        let maxKey =
+            if options.alignAttributes then
+                fields |> List.map (fst >> String.length) |> List.fold max 0
+            else
+                0
+
+        fields
+        |> List.map (fun (key, value) -> key, maxKey, value)
+        |> List.map (fun (key, maxKey, value) ->
+            let renderedKey = if options.alignAttributes then key.PadRight maxKey else key
+            $"{padding indent}{renderedKey} = {renderValueAt options indent value}")
+
+    and private renderValueAt options indent value =
+        match value with
+        | Null -> "null"
+        | String value -> $"\"{escapeString value}\""
+        | Bool true -> "true"
+        | Bool false -> "false"
+        | Number value -> value
+        | Raw value -> value
+        | Object [] -> "{}"
+        | Object fields ->
+            let childIndent = indent + options.indentSize
+            let body = renderFields options childIndent fields |> String.concat "\n"
+            "{\n" + body + "\n" + padding indent + "}"
+        | List [] -> "[]"
+        | List values ->
+            let childIndent = indent + options.indentSize
+
+            let body =
+                values
+                |> List.map (fun value -> $"{padding childIndent}{renderValueAt options childIndent value},")
+                |> String.concat "\n"
+
+            "[\n" + body + "\n" + padding indent + "]"
+        | FunctionCall(name, arguments) ->
+            let renderedArguments =
+                arguments |> List.map (renderValueAt options indent) |> String.concat ", "
+
+            $"{name}({renderedArguments})"
+
+    let rec private renderContainer options indent opener closer body =
+        let pad = padding indent
+        let childIndent = indent + options.indentSize
+        let childMaxKey = maxKeyWidth body
+        let renderedBody = body |> List.collect (renderNode options childIndent childMaxKey)
+
+        match renderedBody with
+        | [] -> [ $"{pad}{opener}{closer}" ]
+        | renderedBody ->
+            [ pad + opener ] @ renderedBody @ [ pad + closer ]
+
+    and private renderNode options indent maxKey node =
+        let pad = padding indent
+
+        match node with
+        | Attribute(key, value) ->
+            let renderedKey = if options.alignAttributes then key.PadRight maxKey else key
+            [ $"{pad}{renderedKey} = {renderValueAt options indent value}" ]
+        | Block(name, labels, body) ->
+            let renderedLabels =
+                labels |> List.map (fun label -> $"\"{escapeString label}\"") |> String.concat " "
+
+            let header = if renderedLabels = "" then $"{name} " else $"{name} {renderedLabels} "
+            renderContainer options indent (header + "{") "}" body
+        | ObjectAssignment(name, body) -> renderContainer options indent ($"{name} = {{") "}" body
+        | ListAssignment(name, body) -> renderContainer options indent ($"{name} = [") "]" body
+        | ListItem value -> [ $"{pad}{renderValueAt options indent value}," ]
+        | RawLine value -> [ pad + value ]
+        | Blank -> [ "" ]
+        | Empty -> []
+
+    /// Renders an HCL document with explicit options.
+    let withOptions options nodes =
+        if options.indentSize < 0 then
+            invalidArg (nameof options) "indentSize must be non-negative"
+
+        let rendered =
+            nodes
+            |> List.collect (renderNode options 0 (maxKeyWidth nodes))
+            |> String.concat "\n"
+
+        if options.trailingNewline then rendered + "\n" else rendered
+
+    /// Renders an HCL document with default options.
+    let document nodes = withOptions defaults nodes
+
+    /// Renders a single HCL node with default options.
+    let node value = document [ value ]
+
+    /// Renders top-level nodes separated by a blank line.
+    let join nodes = nodes |> List.map node |> String.concat "\n"

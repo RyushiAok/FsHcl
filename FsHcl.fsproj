@@ -15,7 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src/Hcl.fs" />
+    <Compile Include="src/HclAst.fs" />
+    <Compile Include="src/HclValue.fs" />
+    <Compile Include="src/HclSyntax.fs" />
+    <Compile Include="src/HclRender.fs" />
     <Compile Include="src/TerraformHcl.fs" />
   </ItemGroup>
 
