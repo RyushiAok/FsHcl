@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="FsHcl.fsproj" />
+  <Folder Name="/Examples/">
+    <Project Path="examples/HelloLambda/HelloLambda.fsproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/FsHcl.Tests.fsproj" />
+  </Folder>
+</Solution>
