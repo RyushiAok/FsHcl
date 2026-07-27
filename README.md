@@ -36,21 +36,17 @@ See [examples/HelloLambda](examples/HelloLambda) for a larger example that gener
 
 ```fsharp
 attr "template_body" (
-    jsonencode
-        {|
-            AWSTemplateFormatVersion = "2010-09-09"
-            Resources =
-                {|
-                    Example =
-                        {|
-                            Type = "AWS::Lambda::Permission"
-                            Properties =
-                                {|
-                                    FunctionName = expr "aws_lambda_function.example.function_name"
-                                    InvokedViaFunctionUrl = true
-                                |}
-                        |}
+    jsonencode {|
+        AWSTemplateFormatVersion = "2010-09-09"
+        Resources = {|
+            Example = {|
+                Type = "AWS::Lambda::Permission"
+                Properties = {|
+                    FunctionName = expr "aws_lambda_function.example.function_name"
+                    InvokedViaFunctionUrl = true
                 |}
+            |}
         |}
+    |}
 )
 ```

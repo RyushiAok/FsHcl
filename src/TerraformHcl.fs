@@ -20,19 +20,16 @@ module TerraformHcl =
         blockWithLabels "data" [ sourceName; name ]
 
     /// Creates a Terraform `variable` block.
-    let variable name =
-        blockWithLabels "variable" [ name ]
+    let variable name = blockWithLabels "variable" [ name ]
 
     /// Creates a Terraform `output` block.
-    let output name =
-        blockWithLabels "output" [ name ]
+    let output name = blockWithLabels "output" [ name ]
 
     /// Creates a Terraform `locals` block.
     let locals = block "locals"
 
     /// Creates a Terraform `module` block.
-    let module_ name =
-        blockWithLabels "module" [ name ]
+    let module_ name = blockWithLabels "module" [ name ]
 
     /// Creates a Terraform `import` block.
     let import_ = block "import"
@@ -47,8 +44,7 @@ module TerraformHcl =
     let removed_ = block "removed"
 
     /// Creates a Terraform `check` block.
-    let check name =
-        blockWithLabels "check" [ name ]
+    let check name = blockWithLabels "check" [ name ]
 
     /// Creates a Terraform `to` expression attribute, used by `import` and `moved`.
     let to_ value = attr "to" (raw value)

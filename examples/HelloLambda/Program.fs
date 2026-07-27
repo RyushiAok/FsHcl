@@ -12,32 +12,22 @@ module HclHelper =
     let expr key value = attr key (raw value)
     let hclString key value = attr key (raw $"\"{value}\"")
 
-    let stringItems values =
-        values |> List.map (str >> item)
+    let stringItems values = values |> List.map (str >> item)
 
-    let hclStringValue value =
-        raw $"\"{value}\""
+    let hclStringValue value = raw $"\"{value}\""
 
-    let exprItems values =
-        values |> List.map (raw >> item)
+    let exprItems values = values |> List.map (raw >> item)
 
     let hclStringItems values =
         values |> List.map (hclStringValue >> item)
 
     let stringList name values =
-        list_ name {
-            yield! stringItems values
-        }
+        list_ name { yield! stringItems values }
 
     let hclStringList name values =
-        list_ name {
-            yield! hclStringItems values
-        }
+        list_ name { yield! hclStringItems values }
 
-    let exprList name values =
-        list_ name {
-            yield! exprItems values
-        }
+    let exprList name values = list_ name { yield! exprItems values }
 
     let hello_lambda_account_id value = string "hello_lambda_account_id" value
     let hello_lambda_repo value = string "hello_lambda_repo" value
@@ -72,24 +62,13 @@ module HclHelper =
     let value value = expr "value" value
 
     let required_providers body =
-        block "required_providers" {
-            yield! body
-        }
+        block "required_providers" { yield! body }
 
-    let providerConfig name body =
-        object_ name {
-            yield! body
-        }
+    let providerConfig name body = object_ name { yield! body }
 
-    let default_tags body =
-        block "default_tags" {
-            yield! body
-        }
+    let default_tags body = block "default_tags" { yield! body }
 
-    let statement body =
-        block "statement" {
-            yield! body
-        }
+    let statement body = block "statement" { yield! body }
 
     let rawPrincipals principalType identifiers =
         block "principals" {
@@ -118,17 +97,15 @@ module HclHelper =
         }
 
 open HclHelper
+
 let mainTf =
-    
+
     hcl {
         terraform {
             required_version ">= 1.15.0"
 
             required_providers [
-                providerConfig "aws" [
-                    string "source" "hashicorp/aws"
-                    string "version" "~> 6.0"
-                ]
+                providerConfig "aws" [ string "source" "hashicorp/aws"; string "version" "~> 6.0" ]
             ]
         }
 
@@ -156,15 +133,11 @@ let mainTf =
             string "value" "ok"
         }
 
-        data "aws_caller_identity" "current" {}
+        data "aws_caller_identity" "current" { }
 
-        output "account_id" {
-            value "data.aws_caller_identity.current.account_id"
-        }
+        output "account_id" { value "data.aws_caller_identity.current.account_id" }
 
-        output "caller_arn" {
-            value "data.aws_caller_identity.current.arn"
-        }
+        output "caller_arn" { value "data.aws_caller_identity.current.arn" }
     }
 
 let helloLambdaTf =
@@ -186,19 +159,13 @@ let helloLambdaTf =
                 effect "Allow"
                 actions [ "sts:AssumeRoleWithWebIdentity" ]
 
-                rawPrincipals
-                    "Federated"
-                    [ "aws_iam_openid_connect_provider.github_actions.arn" ]
+                rawPrincipals "Federated" [ "aws_iam_openid_connect_provider.github_actions.arn" ]
 
-                condition
-                    "StringEquals"
-                    "token.actions.githubusercontent.com:aud"
-                    [ "sts.amazonaws.com" ]
+                condition "StringEquals" "token.actions.githubusercontent.com:aud" [ "sts.amazonaws.com" ]
 
-                hclStringCondition
-                    "StringLike"
-                    "token.actions.githubusercontent.com:sub"
-                    [ "repo:${local.hello_lambda_repo}:ref:refs/heads/main" ]
+                hclStringCondition "StringLike" "token.actions.githubusercontent.com:sub" [
+                    "repo:${local.hello_lambda_repo}:ref:refs/heads/main"
+                ]
             ]
         }
 
@@ -211,15 +178,11 @@ let helloLambdaTf =
             statement [
                 effect "Allow"
 
-                actions
-                    [
-                        "lambda:GetFunction"
-                        "lambda:CreateFunction"
-                        "lambda:UpdateFunctionCode"
-                    ]
+                actions [ "lambda:GetFunction"; "lambda:CreateFunction"; "lambda:UpdateFunctionCode" ]
 
-                hclStringResources
-                    [ "arn:aws:lambda:ap-northeast-1:${local.hello_lambda_account_id}:function:${local.hello_lambda_name}" ]
+                hclStringResources [
+                    "arn:aws:lambda:ap-northeast-1:${local.hello_lambda_account_id}:function:${local.hello_lambda_name}"
+                ]
             ]
 
             statement [
@@ -253,9 +216,7 @@ let helloLambdaTf =
             policy_arn "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         }
 
-        data "aws_lambda_function" "hello_lambda" {
-            function_name "local.hello_lambda_name"
-        }
+        data "aws_lambda_function" "hello_lambda" { function_name "local.hello_lambda_name" }
 
         resource "aws_lambda_function_url" "hello_lambda" {
             function_name "data.aws_lambda_function.hello_lambda.function_name"
@@ -275,40 +236,30 @@ let helloLambdaTf =
             name "hello-lambda-function-url-invoke-function-permission"
 
             template_body (
-                jsonencode
-                    {|
-                        AWSTemplateFormatVersion = "2010-09-09"
-                        Resources =
-                            {|
-                                InvokeFunctionPermission =
-                                    {|
-                                        Type = "AWS::Lambda::Permission"
-                                        Properties =
-                                            {|
-                                                Action = "lambda:InvokeFunction"
-                                                FunctionName = Values.expr "data.aws_lambda_function.hello_lambda.function_name"
-                                                Principal = "*"
-                                                InvokedViaFunctionUrl = true
-                                            |}
-                                    |}
+                jsonencode {|
+                    AWSTemplateFormatVersion = "2010-09-09"
+                    Resources = {|
+                        InvokeFunctionPermission = {|
+                            Type = "AWS::Lambda::Permission"
+                            Properties = {|
+                                Action = "lambda:InvokeFunction"
+                                FunctionName = Values.expr "data.aws_lambda_function.hello_lambda.function_name"
+                                Principal = "*"
+                                InvokedViaFunctionUrl = true
                             |}
+                        |}
                     |}
+                |}
             )
 
             depends_on [ "aws_lambda_function_url.hello_lambda" ]
         }
 
-        output "hello_lambda_github_actions_deploy_role_arn" {
-            value "aws_iam_role.hello_lambda_github_actions_deploy.arn"
-        }
+        output "hello_lambda_github_actions_deploy_role_arn" { value "aws_iam_role.hello_lambda_github_actions_deploy.arn" }
 
-        output "hello_lambda_execution_role_arn" {
-            value "aws_iam_role.hello_lambda_execution.arn"
-        }
+        output "hello_lambda_execution_role_arn" { value "aws_iam_role.hello_lambda_execution.arn" }
 
-        output "hello_lambda_function_url" {
-            value "aws_lambda_function_url.hello_lambda.function_url"
-        }
+        output "hello_lambda_function_url" { value "aws_lambda_function_url.hello_lambda.function_url" }
     }
 
 [<EntryPoint>]

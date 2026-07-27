@@ -47,7 +47,11 @@ module Render =
         | Object [] -> "{}"
         | Object fields ->
             let childIndent = indent + options.indentSize
-            let body = renderFields options childIndent fields |> String.concat "\n"
+
+            let body =
+                renderFields options childIndent fields
+                |> String.concat "\n"
+
             "{\n" + body + "\n" + padding indent + "}"
         | List [] -> "[]"
         | List values ->
@@ -61,7 +65,9 @@ module Render =
             "[\n" + body + "\n" + padding indent + "]"
         | FunctionCall(name, arguments) ->
             let renderedArguments =
-                arguments |> List.map (renderValueAt options indent) |> String.concat ", "
+                arguments
+                |> List.map (renderValueAt options indent)
+                |> String.concat ", "
 
             $"{name}({renderedArguments})"
 
@@ -69,12 +75,14 @@ module Render =
         let pad = padding indent
         let childIndent = indent + options.indentSize
         let childMaxKey = maxKeyWidth body
-        let renderedBody = body |> List.collect (renderNode options childIndent childMaxKey)
+
+        let renderedBody =
+            body
+            |> List.collect (renderNode options childIndent childMaxKey)
 
         match renderedBody with
         | [] -> [ $"{pad}{opener}{closer}" ]
-        | renderedBody ->
-            [ pad + opener ] @ renderedBody @ [ pad + closer ]
+        | renderedBody -> [ pad + opener ] @ renderedBody @ [ pad + closer ]
 
     and private renderNode options indent maxKey node =
         let pad = padding indent
@@ -85,9 +93,16 @@ module Render =
             [ $"{pad}{renderedKey} = {renderValueAt options indent value}" ]
         | Block(name, labels, body) ->
             let renderedLabels =
-                labels |> List.map (fun label -> $"\"{escapeString label}\"") |> String.concat " "
+                labels
+                |> List.map (fun label -> $"\"{escapeString label}\"")
+                |> String.concat " "
 
-            let header = if renderedLabels = "" then $"{name} " else $"{name} {renderedLabels} "
+            let header =
+                if renderedLabels = "" then
+                    $"{name} "
+                else
+                    $"{name} {renderedLabels} "
+
             renderContainer options indent (header + "{") "}" body
         | ObjectAssignment(name, body) -> renderContainer options indent ($"{name} = {{") "}" body
         | ListAssignment(name, body) -> renderContainer options indent ($"{name} = [") "]" body
@@ -106,7 +121,10 @@ module Render =
             |> List.collect (renderNode options 0 (maxKeyWidth nodes))
             |> String.concat "\n"
 
-        if options.trailingNewline then rendered + "\n" else rendered
+        if options.trailingNewline then
+            rendered + "\n"
+        else
+            rendered
 
     /// Renders an HCL document with default options.
     let document nodes = withOptions defaults nodes
@@ -115,4 +133,5 @@ module Render =
     let node value = document [ value ]
 
     /// Renders top-level nodes separated by a blank line.
-    let join nodes = nodes |> List.map node |> String.concat "\n"
+    let join nodes =
+        nodes |> List.map node |> String.concat "\n"

@@ -9,7 +9,9 @@ open Microsoft.FSharp.Reflection
 /// HCL value constructors and conversions.
 module Values =
     let private recordFlags =
-        BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Instance
+        BindingFlags.Public
+        ||| BindingFlags.NonPublic
+        ||| BindingFlags.Instance
 
     /// Escapes a string for use as an HCL string literal.
     let escapeString (value: string) =
@@ -102,9 +104,12 @@ module Values =
             |> List.map (fun (key, value) -> key, valueOfObj value)
             |> Value.Object
         | :? IEnumerable as values ->
-            values |> Seq.cast<obj> |> Seq.map valueOfObj |> Seq.toList |> Value.List
-        | value when isNumericType (value.GetType()) ->
-            value |> numericLiteral (nameof value) |> Value.Number
+            values
+            |> Seq.cast<obj>
+            |> Seq.map valueOfObj
+            |> Seq.toList
+            |> Value.List
+        | value when isNumericType (value.GetType()) -> value |> numericLiteral (nameof value) |> Value.Number
         | value when FSharpType.IsRecord(value.GetType(), recordFlags) ->
             value
             |> recordFields
@@ -131,6 +136,7 @@ module Values =
         member _.Delay(build: unit -> (string * Value) list) = build
         member _.Run(build: unit -> (string * Value) list) = Value.Object(build ())
         member _.Zero() : (string * Value) list = []
+
         member _.For(values: 'a seq, build: 'a -> (string * Value) list) =
             values |> Seq.collect build |> Seq.toList
 
@@ -141,7 +147,9 @@ module Values =
         member _.Delay(build: unit -> Value list) = build
         member _.Run(build: unit -> Value list) = Value.List(build ())
         member _.Zero() : Value list = []
-        member _.For(values: 'a seq, build: 'a -> Value list) = values |> Seq.collect build |> Seq.toList
+
+        member _.For(values: 'a seq, build: 'a -> Value list) =
+            values |> Seq.collect build |> Seq.toList
 
     type ObjectFieldBuilder(key: string) =
         inherit ObjectBuilder()

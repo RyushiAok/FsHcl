@@ -11,7 +11,9 @@ module Syntax =
         member _.Combine(left, right: unit -> Node list) = left @ right ()
         member _.Delay(build: unit -> Node list) = build
         member _.Zero() : Node list = []
-        member _.For(values: 'a seq, build: 'a -> Node list) = values |> Seq.collect build |> Seq.toList
+
+        member _.For(values: 'a seq, build: 'a -> Node list) =
+            values |> Seq.collect build |> Seq.toList
 
     type BodyBuilder() =
         inherit NodeCollectionBuilder()
@@ -27,22 +29,27 @@ module Syntax =
     let hcl = BodyBuilder()
 
     /// Creates an unlabeled HCL block.
-    let block name = ContainerBuilder(fun body -> Block(name, [], body))
+    let block name =
+        ContainerBuilder(fun body -> Block(name, [], body))
 
     /// Creates an HCL block with string labels.
-    let blockWithLabels name labels = ContainerBuilder(fun body -> Block(name, labels, body))
+    let blockWithLabels name labels =
+        ContainerBuilder(fun body -> Block(name, labels, body))
 
     /// Creates an object assignment, for example `variables = { ... }`.
-    let object_ name = ContainerBuilder(fun body -> ObjectAssignment(name, body))
+    let object_ name =
+        ContainerBuilder(fun body -> ObjectAssignment(name, body))
 
     /// Creates a list assignment, for example `patterns = [ ... ]`.
-    let list_ name = ContainerBuilder(fun body -> ListAssignment(name, body))
+    let list_ name =
+        ContainerBuilder(fun body -> ListAssignment(name, body))
 
     /// Creates an HCL attribute.
     let attr key value = Attribute(key, value)
 
     /// Creates an optional HCL attribute, omitted when `None`.
-    let optAttr key = function
+    let optAttr key =
+        function
         | Some value -> Attribute(key, value)
         | None -> Empty
 

@@ -40,9 +40,7 @@ module HclTests =
                 blockWithLabels "module" [ "my_module" ] {
                     attr "source" (str "./my-module")
 
-                    list_ "patterns" {
-                        item (str "infra/**")
-                    }
+                    list_ "patterns" { item (str "infra/**") }
                 }
             }
             |> document
@@ -54,12 +52,11 @@ module HclTests =
     [<Fact>]
     let ``renders empty labelled block on one line`` () =
         let result =
-            hcl {
-                blockWithLabels "data" [ "aws_caller_identity"; "current" ] {}
-            }
+            hcl { blockWithLabels "data" [ "aws_caller_identity"; "current" ] { } }
             |> document
 
-        result |> should equal "data \"aws_caller_identity\" \"current\" {}\n"
+        result
+        |> should equal "data \"aws_caller_identity\" \"current\" {}\n"
 
     [<Fact>]
     let ``renders a block containing only omitted attributes on one line`` () =
@@ -74,22 +71,19 @@ module HclTests =
                 block "resource" {
                     attr
                         "template_body"
-                        (jsonencode
-                            {|
-                                Name = "example"
-                                Enabled = true
-                                Ref = expr "local.example"
-                                Nested =
-                                    {|
-                                        Value = "ok"
-                                        Count = 2
-                                    |}
-                            |})
+                        (jsonencode {|
+                            Name = "example"
+                            Enabled = true
+                            Ref = expr "local.example"
+                            Nested = {| Value = "ok"; Count = 2 |}
+                        |})
                 }
             }
             |> document
 
-        result |> should haveSubstring "template_body = jsonencode({"
+        result
+        |> should haveSubstring "template_body = jsonencode({"
+
         result |> should haveSubstring "Name    = \"example\""
         result |> should haveSubstring "Enabled = true"
         result |> should haveSubstring "Ref     = local.example"
@@ -100,11 +94,7 @@ module HclTests =
     [<Fact>]
     let ``renders jsonencode sequences`` () =
         let result =
-            hcl {
-                block "resource" {
-                    attr "values" (jsonencode [ "a"; "b" ])
-                }
-            }
+            hcl { block "resource" { attr "values" (jsonencode [ "a"; "b" ]) } }
             |> document
 
         result |> should haveSubstring "values = jsonencode(["
@@ -123,7 +113,12 @@ module HclTests =
         let result =
             hcl {
                 block "locals" {
-                    attr "config" (obj { stringField "long_name" "value"; boolField "on" true })
+                    attr
+                        "config"
+                        (obj {
+                            stringField "long_name" "value"
+                            boolField "on" true
+                        })
                 }
             }
             |> withOptions options
@@ -150,15 +145,14 @@ module TerraformHclTests =
     open Syntax
     open TerraformHcl
     open Values
+
     [<Fact>]
     let ``terraform helpers cover syntax blocks`` () =
         let result =
             hcl {
                 provider "tfe" { attr "hostname" (str "app.terraform.io") }
 
-                resource "tfe_project" "project" {
-                    attr "name" (str "example")
-                }
+                resource "tfe_project" "project" { attr "name" (str "example") }
 
                 moved_ {
                     from_ "tfe_project.old"
@@ -168,7 +162,10 @@ module TerraformHclTests =
             |> document
 
         result |> should haveSubstring "provider \"tfe\" {"
-        result |> should haveSubstring "resource \"tfe_project\" \"project\" {"
+
+        result
+        |> should haveSubstring "resource \"tfe_project\" \"project\" {"
+
         result |> should haveSubstring "moved {"
         result |> should haveSubstring "from = tfe_project.old"
         result |> should haveSubstring "to   = tfe_project.project"
