@@ -11,9 +11,13 @@
     <PackageTags>fsharp;hcl;terraform;dsl</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/RyushiAok/FsHcl</RepositoryUrl>
+    <RepositoryBranch>main</RepositoryBranch>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/ryushiaok/FsHcl</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/RyushiAok/FsHcl/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://ryushiaok.github.io/FsHcl</PackageProjectUrl>
+    <FsDocsLicenseLink>https://github.com/RyushiAok/FsHcl/blob/main/LICENSE</FsDocsLicenseLink>
+    <FsDocsReleaseNotesLink>https://github.com/RyushiAok/FsHcl/releases</FsDocsReleaseNotesLink>
   </PropertyGroup>
 
   <ItemGroup>
