@@ -12,6 +12,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/ryushiaok/FsHcl</RepositoryUrl>
+    <PackageProjectUrl>https://ryushiaok.github.io/FsHcl</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
