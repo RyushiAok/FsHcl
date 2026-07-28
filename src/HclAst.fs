@@ -7,12 +7,24 @@ type Expr = internal Expr of string
 type Value =
     | Null
     | String of string
+    | TemplateString of string
     | Bool of bool
     | Number of string
     | Raw of string
+    | Heredoc of delimiter: string * content: string * indented: bool
     | Object of (string * Value) list
     | List of Value list
     | FunctionCall of name: string * arguments: Value list
+    | Conditional of condition: string * trueExpr: string * falseExpr: string
+    | ForTuple of variable: string * collection: string * expr: string * condition: string option
+    | ForObject of
+        keyVar: string *
+        valueVar: string *
+        collection: string *
+        keyExpr: string *
+        valueExpr: string *
+        grouping: bool *
+        condition: string option
 
 /// A renderable HCL syntax node.
 type Node =
@@ -21,6 +33,8 @@ type Node =
     | ObjectAssignment of name: string * body: Node list
     | ListAssignment of name: string * body: Node list
     | ListItem of Value
+    | LineComment of string
+    | BlockComment of string list
     | RawLine of string
     | Blank
     | Empty

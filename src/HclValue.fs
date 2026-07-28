@@ -65,6 +65,40 @@ module Values =
     /// Creates a raw HCL expression value.
     let raw value = Value.Raw value
 
+    /// Creates a template string value (preserves `${...}` interpolation sequences).
+    let templateStr value = Value.TemplateString value
+
+    /// Creates a heredoc string value.
+    let heredoc delimiter content =
+        Value.Heredoc(delimiter, content, false)
+
+    /// Creates an indented heredoc string value (`<<-` syntax).
+    let heredocIndent delimiter content = Value.Heredoc(delimiter, content, true)
+
+    /// Creates a conditional expression value.
+    let conditional condition trueExpr falseExpr =
+        Value.Conditional(condition, trueExpr, falseExpr)
+
+    /// Creates a for-tuple expression value, for example `[for v in list : v.id]`.
+    let forTuple variable collection expr =
+        Value.ForTuple(variable, collection, expr, None)
+
+    /// Creates a for-tuple expression value with a condition filter.
+    let forTupleIf variable collection expr condition =
+        Value.ForTuple(variable, collection, expr, Some condition)
+
+    /// Creates a for-object expression value, for example `{for k, v in map : k => v}`.
+    let forObject keyVar valueVar collection keyExpr valueExpr =
+        Value.ForObject(keyVar, valueVar, collection, keyExpr, valueExpr, false, None)
+
+    /// Creates a for-object expression value with grouping mode (`...`).
+    let forObjectGroup keyVar valueVar collection keyExpr valueExpr =
+        Value.ForObject(keyVar, valueVar, collection, keyExpr, valueExpr, true, None)
+
+    /// Creates a for-object expression value with a condition filter.
+    let forObjectIf keyVar valueVar collection keyExpr valueExpr condition =
+        Value.ForObject(keyVar, valueVar, collection, keyExpr, valueExpr, false, Some condition)
+
     /// Creates an HCL null value.
     let null_ = Value.Null
 

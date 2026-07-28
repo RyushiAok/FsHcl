@@ -40,10 +40,14 @@ module Render =
         match value with
         | Null -> "null"
         | String value -> $"\"{escapeString value}\""
+        | TemplateString value -> $"\"{value}\""
         | Bool true -> "true"
         | Bool false -> "false"
         | Number value -> value
         | Raw value -> value
+        | Heredoc(delimiter, content, indented) ->
+            let marker = if indented then "<<-" else "<<"
+            $"{marker}{delimiter}\n{content}\n{padding indent}{delimiter}"
         | Object [] -> "{}"
         | Object fields ->
             let childIndent = indent + options.indentSize
@@ -70,6 +74,22 @@ module Render =
                 |> String.concat ", "
 
             $"{name}({renderedArguments})"
+        | Conditional(condition, trueExpr, falseExpr) -> $"{condition} ? {trueExpr} : {falseExpr}"
+        | ForTuple(variable, collection, expr, condition) ->
+            let cond =
+                match condition with
+                | Some c -> $" if {c}"
+                | None -> ""
+
+            $"[for {variable} in {collection} : {expr}{cond}]"
+        | ForObject(keyVar, valueVar, collection, keyExpr, valueExpr, grouping, condition) ->
+            let cond =
+                match condition with
+                | Some c -> $" if {c}"
+                | None -> ""
+
+            let dots = if grouping then "..." else ""
+            $"{{for {keyVar}, {valueVar} in {collection} : {keyExpr} => {valueExpr}{dots}{cond}}}"
 
     let rec private renderContainer options indent opener closer body =
         let pad = padding indent
@@ -107,6 +127,12 @@ module Render =
         | ObjectAssignment(name, body) -> renderContainer options indent ($"{name} = {{") "}" body
         | ListAssignment(name, body) -> renderContainer options indent ($"{name} = [") "]" body
         | ListItem value -> [ $"{pad}{renderValueAt options indent value}," ]
+        | LineComment text -> [ $"{pad}# {text}" ]
+        | BlockComment lines ->
+            [ $"{pad}/*" ]
+            @ (lines
+               |> List.map (fun line -> if line = "" then $"{pad}" else $"{pad}{line}"))
+            @ [ $"{pad}*/" ]
         | RawLine value -> [ pad + value ]
         | Blank -> [ "" ]
         | Empty -> []

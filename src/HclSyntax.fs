@@ -59,5 +59,11 @@ module Syntax =
     /// Creates an unparsed HCL line.
     let rawLine value = RawLine value
 
+    /// Creates a line comment (`# ...`).
+    let comment text = LineComment text
+
+    /// Creates a block comment (`/* ... */`).
+    let blockComment lines = BlockComment lines
+
     /// Creates a blank line.
     let blank = Blank
