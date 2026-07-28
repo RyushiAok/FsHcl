@@ -2,13 +2,12 @@ namespace FsTests
 
 open Xunit
 open FsUnit.Xunit
-open FsHcl
 open FsHcl.Hcl
+open FsHcl.Hcl.Render
+open FsHcl.Hcl.Syntax
+open FsHcl.Hcl.Values
 
-module HclTests =
-    open Render
-    open Syntax
-    open Values
+module RenderTests =
 
     [<Fact>]
     let ``escapes HCL strings`` () =
@@ -140,32 +139,40 @@ module HclTests =
         |> Render.node
         |> should haveSubstring "nested = {"
 
-module TerraformHclTests =
-    open Render
-    open Syntax
-    open TerraformHcl
-    open Values
+    [<Fact>]
+    let ``renders null value`` () =
+        attr "value" null_
+        |> Render.node
+        |> should equal "value = null\n"
 
     [<Fact>]
-    let ``terraform helpers cover syntax blocks`` () =
+    let ``renders empty object value`` () =
+        attr "tags" (obj { () })
+        |> Render.node
+        |> should equal "tags = {}\n"
+
+    [<Fact>]
+    let ``renders empty list value`` () =
+        attr "items" (arr { () })
+        |> Render.node
+        |> should equal "items = []\n"
+
+    [<Fact>]
+    let ``renders join separating nodes with blank lines`` () =
+        [ block "a" { attr "x" (number 1) }; block "b" { attr "y" (number 2) } ]
+        |> Render.join
+        |> should equal "a {\n  x = 1\n}\n\nb {\n  y = 2\n}\n"
+
+    [<Fact>]
+    let ``supports for loop in computation expression`` () =
+        let names = [ "alpha"; "beta" ]
+
         let result =
             hcl {
-                provider "tfe" { attr "hostname" (str "app.terraform.io") }
-
-                resource "tfe_project" "project" { attr "name" (str "example") }
-
-                moved_ {
-                    from_ "tfe_project.old"
-                    to_ "tfe_project.project"
-                }
+                for name in names do
+                    attr name (str name)
             }
             |> document
 
-        result |> should haveSubstring "provider \"tfe\" {"
-
-        result
-        |> should haveSubstring "resource \"tfe_project\" \"project\" {"
-
-        result |> should haveSubstring "moved {"
-        result |> should haveSubstring "from = tfe_project.old"
-        result |> should haveSubstring "to   = tfe_project.project"
+        result |> should haveSubstring "alpha = \"alpha\""
+        result |> should haveSubstring "beta  = \"beta\""
