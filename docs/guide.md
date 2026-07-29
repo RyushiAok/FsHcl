@@ -255,20 +255,20 @@ hcl {
 
 ## Rendering
 
-| Function | Description |
-|----------|-------------|
-| `document` | Render with default options |
-| `Render.node` | Render a single node |
+| Function      | Description                           |
+| ------------- | ------------------------------------- |
+| `document`    | Render with default options           |
+| `Render.node` | Render a single node                  |
 | `Render.join` | Render nodes separated by blank lines |
-| `withOptions` | Render with custom options |
+| `withOptions` | Render with custom options            |
 
 ### RenderOptions
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `indentSize` | `2` | Spaces per indent level |
-| `alignAttributes` | `true` | Pad attribute keys to equal width |
-| `trailingNewline` | `true` | Append newline at end of output |
+| Option            | Default | Description                       |
+| ----------------- | ------- | --------------------------------- |
+| `indentSize`      | `2`     | Spaces per indent level           |
+| `alignAttributes` | `true`  | Pad attribute keys to equal width |
+| `trailingNewline` | `true`  | Append newline at end of output   |
 
 ```fsharp
 let options = { indentSize = 4; alignAttributes = false; trailingNewline = false }
@@ -282,20 +282,20 @@ hcl { block "locals" { attr "x" (number 1) } } |> withOptions options
 
 Available with `open FsHcl.TerraformHcl`.
 
-| Function | HCL Output |
-|----------|-----------|
-| `terraform { ... }` | `terraform { ... }` |
-| `provider "aws" { ... }` | `provider "aws" { ... }` |
+| Function                         | HCL Output                       |
+| -------------------------------- | -------------------------------- |
+| `terraform { ... }`              | `terraform { ... }`              |
+| `provider "aws" { ... }`         | `provider "aws" { ... }`         |
 | `resource "type" "name" { ... }` | `resource "type" "name" { ... }` |
-| `data "type" "name" { ... }` | `data "type" "name" { ... }` |
-| `variable "name" { ... }` | `variable "name" { ... }` |
-| `output "name" { ... }` | `output "name" { ... }` |
-| `locals { ... }` | `locals { ... }` |
-| `module_ "name" { ... }` | `module "name" { ... }` |
-| `import_ { ... }` | `import { ... }` |
-| `moved_ { ... }` | `moved { ... }` |
-| `removed_ { ... }` | `removed { ... }` |
-| `check "name" { ... }` | `check "name" { ... }` |
+| `data "type" "name" { ... }`     | `data "type" "name" { ... }`     |
+| `variable "name" { ... }`        | `variable "name" { ... }`        |
+| `output "name" { ... }`          | `output "name" { ... }`          |
+| `locals { ... }`                 | `locals { ... }`                 |
+| `module_ "name" { ... }`         | `module "name" { ... }`          |
+| `import_ { ... }`                | `import { ... }`                 |
+| `moved_ { ... }`                 | `moved { ... }`                  |
+| `removed_ { ... }`               | `removed { ... }`                |
+| `check "name" { ... }`           | `check "name" { ... }`           |
 
 `to_`, `from_`, and `id` are used inside `import` / `moved` / `removed` blocks:
 
@@ -321,3 +321,57 @@ hcl {
 //   id = "my-bucket-name"
 // }
 ```
+
+## Recommended Pattern
+
+Define project-specific helper functions that wrap `attr`, `str`, `raw`, etc. This removes boilerplate and makes the HCL read declaratively.
+
+```fsharp
+module MyProject =
+    open FsHcl.Hcl
+
+    let name value = attr "name" (str value)
+    let region value = attr "region" (str value)
+    let role value = attr "role" (raw value)
+    let function_name value = attr "function_name" (raw value)
+    let depends_on values = list_ "depends_on" { for v in values do item (raw v) }
+```
+
+```fsharp
+open MyProject
+open FsHcl.Hcl
+open FsHcl.TerraformHcl
+
+hcl {
+    resource "aws_iam_role" "deploy" {
+        name "github-actions-deploy"
+        role "data.aws_iam_policy_document.assume.json"
+    }
+
+    resource "aws_lambda_function_url" "api" {
+        function_name "data.aws_lambda_function.api.function_name"
+        attr "authorization_type" (str "NONE")
+        depends_on [ "aws_lambda_function.api" ]
+    }
+}
+|> document
+// resource "aws_iam_role" "deploy" {
+//   name = "github-actions-deploy"
+//   role = data.aws_iam_policy_document.assume.json
+// }
+// resource "aws_lambda_function_url" "api" {
+//   function_name      = data.aws_lambda_function.api.function_name
+//   authorization_type = "NONE"
+//   depends_on = [
+//     aws_lambda_function.api,
+//   ]
+// }
+```
+
+Guidelines:
+
+- Wrap attributes that appear more than once across resources.
+- Use `str` for literal string values, `raw` for Terraform references — the helper makes this distinction explicit so callers don't need to think about it.
+- Extract repeated nested blocks (e.g. `statement`, `condition`) into functions that take the varying parts as parameters.
+
+See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a full working example.
