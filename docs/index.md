@@ -1,9 +1,6 @@
 # FsHcl
 
-A small typed HCL generation DSL for F#.
-
-FsHcl lets you build [HCL](https://github.com/hashicorp/hcl) documents in F# using computation expressions and typed values.
-It ships as a `netstandard2.0` library so it works with .NET Framework, .NET Core, and .NET 5+.
+A typed HCL generation DSL for F#.
 
 ## Installation
 
@@ -14,10 +11,7 @@ dotnet add package FsHcl
 ## Quick Start
 
 ```fsharp
-open FsHcl
-open FsHcl.Hcl.Render
-open FsHcl.Hcl.Syntax
-open FsHcl.Hcl.Values
+open FsHcl.Hcl
 open FsHcl.TerraformHcl
 
 hcl {
@@ -55,28 +49,14 @@ output "bucket_arn" {
 }
 ```
 
-## Modules
+## Project-Specific Helpers
 
-| Module | Description |
-|--------|-------------|
-| [`FsHcl.Hcl.Values`](reference/FsHcl.Hcl.Values.html) | Typed values and CLR/F# value conversion |
-| [`FsHcl.Hcl.Syntax`](reference/FsHcl.Hcl.Syntax.html) | Block, attribute, list, and document builders |
-| [`FsHcl.Hcl.Render`](reference/FsHcl.Hcl.Render.html) | Configurable rendering |
-| [`FsHcl.TerraformHcl`](reference/FsHcl.TerraformHcl.html) | Terraform-specific syntax helpers |
-
-Read the [Usage Guide](guide.html) for detailed explanations and examples of every feature.
-
-### Recommended Pattern
-
-FsHcl is designed as a set of generic building blocks.
-The recommended workflow is to define **project-specific helper functions** that wrap `attr`, `str`, `raw`, etc., so your HCL reads declaratively:
+Define thin wrapper functions to avoid repeating `attr "key" (str "value")`:
 
 ```fsharp
-// Define helpers once
 let name value = attr "name" (str value)
 let role value = attr "role" (raw value)
 
-// Use them declaratively
 hcl {
     resource "aws_iam_role" "deploy" {
         name "github-actions-deploy"
@@ -86,4 +66,6 @@ hcl {
 |> document
 ```
 
-See the [Building Project-Specific Helpers](guide.html#Building-Project-Specific-Helpers) section in the guide and the [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) example for this pattern in practice.
+See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a full working example.
+
+Read the [Usage Guide](guide.html) for all available functions.

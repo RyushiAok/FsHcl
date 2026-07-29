@@ -1,21 +1,9 @@
 # FsHcl
 
-A small typed HCL generation DSL for F#.
-
-The generic HCL API is split by responsibility:
-
-- `FsHcl.Hcl.Values`: typed values and CLR/F# value conversion
-- `FsHcl.Hcl.Syntax`: block, attribute, list, and document builders
-- `FsHcl.Hcl.Render`: configurable rendering
-
-`TerraformHcl` adds helpers for Terraform syntax elements such as `terraform`, `provider`, `resource`, `data`, `variable`, `output`, `module_`, `import_`, and `moved_`.
-Provider-specific or module-specific arguments such as `project_name` should be defined by callers with `Syntax.attr`.
+A typed HCL generation DSL for F#.
 
 ```fsharp
-open FsHcl
-open FsHcl.Hcl.Render
-open FsHcl.Hcl.Syntax
-open FsHcl.Hcl.Values
+open FsHcl.Hcl
 open FsHcl.TerraformHcl
 
 hcl {
@@ -30,9 +18,7 @@ hcl {
 |> document
 ```
 
-See [examples/HelloLambda](examples/HelloLambda) for a larger example that generates an AWS Lambda-related Terraform file.
-
-`jsonencode(...)` can be built from anonymous records:
+`jsonencode(...)` is built from anonymous records:
 
 ```fsharp
 attr "template_body" (
@@ -50,3 +36,5 @@ attr "template_body" (
     |}
 )
 ```
+
+See [examples/HelloLambda](examples/HelloLambda) for a larger example.
