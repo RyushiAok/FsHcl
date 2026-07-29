@@ -7,6 +7,7 @@ open System.Reflection
 open Microsoft.FSharp.Reflection
 
 /// HCL value constructors and conversions.
+[<AutoOpen>]
 module Values =
     let private recordFlags =
         BindingFlags.Public

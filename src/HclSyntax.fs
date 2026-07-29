@@ -3,6 +3,7 @@ namespace FsHcl.Hcl
 open FsHcl.Hcl.Values
 
 /// Computation expressions and constructors for HCL syntax nodes.
+[<AutoOpen>]
 module Syntax =
     [<AbstractClass>]
     type NodeCollectionBuilder() =

@@ -3,9 +3,6 @@ namespace FsTests
 open Xunit
 open FsUnit.Xunit
 open FsHcl.Hcl
-open FsHcl.Hcl.Render
-open FsHcl.Hcl.Syntax
-open FsHcl.Hcl.Values
 
 module RenderTests =
 

@@ -1,9 +1,5 @@
 open System
-open FsHcl
 open FsHcl.Hcl
-open FsHcl.Hcl.Render
-open FsHcl.Hcl.Syntax
-open FsHcl.Hcl.Values
 open FsHcl.TerraformHcl
 
 module HclHelper =

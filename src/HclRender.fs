@@ -4,6 +4,7 @@ open System
 open FsHcl.Hcl.Values
 
 /// HCL rendering functions.
+[<AutoOpen>]
 module Render =
     /// Default Terraform-style rendering options.
     let defaults = {
