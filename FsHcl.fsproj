@@ -8,7 +8,7 @@
     <Version>0.1.0</Version>
     <Authors>ryushiaok</Authors>
     <Description>A small typed HCL generation DSL for F#.</Description>
-    <PackageTags>fsharp;hcl;terraform;dsl</PackageTags>
+    <PackageTags>fsharp;hcl;terraform;dsl;iac;infrastructure-as-code;code-generation;dotnet</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/RyushiAok/FsHcl</RepositoryUrl>
