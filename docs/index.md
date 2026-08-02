@@ -18,12 +18,10 @@ hcl {
     resource "aws_s3_bucket" "example" {
         attr "bucket" (str "my-bucket")
 
-        attr "tags" (
-            obj {
-                stringField "Environment" "production"
-                stringField "ManagedBy" "terraform"
-            }
-        )
+        attr "tags" (ofRecord {|
+            Environment = "production";
+            ManagedBy = "terraform"
+        |})
     }
 
     output "bucket_arn" {
