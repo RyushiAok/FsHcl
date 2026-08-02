@@ -25,6 +25,7 @@ jobs:
       - name: Generate sitemap
         run: |
           cp docs/robots.txt ./output/robots.txt
+          cp docs/google338969153909947f.html ./output/google338969153909947f.html
           BASE_URL="https://ryushiaok.github.io/FsHcl"
           echo '<?xml version="1.0" encoding="UTF-8"?>' > ./output/sitemap.xml
           echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> ./output/sitemap.xml
