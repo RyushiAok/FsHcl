@@ -511,6 +511,7 @@ Guidelines:
 
 - Wrap attributes that appear more than once across resources.
 - Use `str` for literal string values, `raw` for Terraform references — the helper makes this distinction explicit so callers don't need to think about it.
-- Extract repeated nested blocks (e.g. `statement`, `condition`) into functions that take the varying parts as parameters.
+- For repeated nested blocks (e.g. `statement`, `condition`), define thin `block` wrappers (`let statement = block "statement"`) rather than functions that hide the body.
+- Choose `list_` or `object_` based on the original Terraform syntax: use `list_` for `name = [...]` (e.g. `actions`, `resources`) and `object_` for `name = { ... }` (e.g. provider configs inside `required_providers`).
 
 See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a full working example.
