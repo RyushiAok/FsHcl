@@ -63,7 +63,7 @@ attr "template_body" (
 ## Examples
 
 See [examples/HelloLambda](examples/HelloLambda) for a larger example.
-https://github.com/RyushiAok/FsHcl/blob/4a04b427a9f2ac3ff9a43a9503073eb04bc3f66e/examples/HelloLambda/Program.fs#L66-L245
+https://github.com/RyushiAok/FsHcl/blob/6a27ad56a190731a3ef36a2b4995803380064f27/examples/HelloLambda/Program.fs#L53-L231
 
 ## License
 
