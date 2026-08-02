@@ -28,7 +28,6 @@ module HclHelper =
     let hello_lambda_account_id value = string "hello_lambda_account_id" value
     let hello_lambda_repo value = string "hello_lambda_repo" value
     let hello_lambda_name value = string "hello_lambda_name" value
-    let required_version value = string "required_version" value
     let region value = string "region" value
     let tags value = attr "tags" value
     let awsApplication value = string "awsApplication" value
@@ -53,44 +52,14 @@ module HclHelper =
     let action value = string "action" value
     let principal value = string "principal" value
     let function_url_auth_type value = string "function_url_auth_type" value
-    let depends_on values = exprList "depends_on" values
     let template_body value = attr "template_body" value
-    let value value = expr "value" value
 
-    let required_providers body =
-        block "required_providers" { yield! body }
+    let default_tags = block "default_tags"
 
-    let providerConfig name body = object_ name { yield! body }
+    let statement = block "statement"
 
-    let default_tags body = block "default_tags" { yield! body }
-
-    let statement body = block "statement" { yield! body }
-
-    let rawPrincipals principalType identifiers =
-        block "principals" {
-            string "type" principalType
-            exprList "identifiers" identifiers
-        }
-
-    let stringPrincipals principalType identifiers =
-        block "principals" {
-            string "type" principalType
-            stringList "identifiers" identifiers
-        }
-
-    let condition test variable values =
-        block "condition" {
-            string "test" test
-            string "variable" variable
-            stringList "values" values
-        }
-
-    let hclStringCondition test variable values =
-        block "condition" {
-            string "test" test
-            string "variable" variable
-            hclStringList "values" values
-        }
+    let principals = block "principals"
+    let condition = block "condition"
 
 open HclHelper
 
@@ -100,15 +69,18 @@ let mainTf =
         terraform {
             required_version ">= 1.15.0"
 
-            required_providers [
-                providerConfig "aws" [ string "source" "hashicorp/aws"; string "version" "~> 6.0" ]
-            ]
+            required_providers {
+                object_ "aws" {
+                    string "source" "hashicorp/aws"
+                    string "version" "~> 6.0"
+                }
+            }
         }
 
         provider "aws" {
             region "ap-northeast-1"
 
-            default_tags [
+            default_tags {
                 tags (
                     obj {
                         stringField
@@ -120,7 +92,7 @@ let mainTf =
                         stringField "Project" "project-name"
                     }
                 )
-            ]
+            }
         }
 
         resource "aws_ssm_parameter" "workspace-name_check" {
@@ -131,9 +103,9 @@ let mainTf =
 
         data "aws_caller_identity" "current" { }
 
-        output "account_id" { value "data.aws_caller_identity.current.account_id" }
+        output "account_id" { value_ (raw "data.aws_caller_identity.current.account_id") }
 
-        output "caller_arn" { value "data.aws_caller_identity.current.arn" }
+        output "caller_arn" { value_ (raw "data.aws_caller_identity.current.arn") }
     }
 
 let helloLambdaTf =
@@ -151,18 +123,29 @@ let helloLambdaTf =
         }
 
         data "aws_iam_policy_document" "hello_lambda_github_actions_assume_role" {
-            statement [
+            statement {
                 effect "Allow"
                 actions [ "sts:AssumeRoleWithWebIdentity" ]
 
-                rawPrincipals "Federated" [ "aws_iam_openid_connect_provider.github_actions.arn" ]
+                principals {
+                    string "type" "Federated"
+                    exprList "identifiers" [ "aws_iam_openid_connect_provider.github_actions.arn" ]
+                }
 
-                condition "StringEquals" "token.actions.githubusercontent.com:aud" [ "sts.amazonaws.com" ]
+                condition {
+                    string "test" "StringEquals"
+                    string "variable" "token.actions.githubusercontent.com:aud"
+                    stringList "values" [ "sts.amazonaws.com" ]
+                }
 
-                hclStringCondition "StringLike" "token.actions.githubusercontent.com:sub" [
-                    "repo:${local.hello_lambda_repo}:ref:refs/heads/main"
-                ]
-            ]
+                condition {
+                    string "test" "StringLike"
+                    string "variable" "token.actions.githubusercontent.com:sub"
+                    hclStringList "values" [
+                        "repo:${local.hello_lambda_repo}:ref:refs/heads/main"
+                    ]
+                }
+            }
         }
 
         resource "aws_iam_role" "hello_lambda_github_actions_deploy" {
@@ -171,7 +154,7 @@ let helloLambdaTf =
         }
 
         data "aws_iam_policy_document" "hello_lambda_github_actions_deploy" {
-            statement [
+            statement {
                 effect "Allow"
 
                 actions [ "lambda:GetFunction"; "lambda:CreateFunction"; "lambda:UpdateFunctionCode" ]
@@ -179,13 +162,13 @@ let helloLambdaTf =
                 hclStringResources [
                     "arn:aws:lambda:ap-northeast-1:${local.hello_lambda_account_id}:function:${local.hello_lambda_name}"
                 ]
-            ]
+            }
 
-            statement [
+            statement {
                 effect "Allow"
                 actions [ "iam:PassRole" ]
                 exprList "resources" [ "aws_iam_role.hello_lambda_execution.arn" ]
-            ]
+            }
         }
 
         resource "aws_iam_role_policy" "hello_lambda_github_actions_deploy" {
@@ -195,11 +178,14 @@ let helloLambdaTf =
         }
 
         data "aws_iam_policy_document" "hello_lambda_execution_assume_role" {
-            statement [
+            statement {
                 effect "Allow"
                 actions [ "sts:AssumeRole" ]
-                stringPrincipals "Service" [ "lambda.amazonaws.com" ]
-            ]
+                principals {
+                    string "type" "Service"
+                    stringList "identifiers" [ "lambda.amazonaws.com" ]
+                }
+            }
         }
 
         resource "aws_iam_role" "hello_lambda_execution" {
@@ -251,11 +237,11 @@ let helloLambdaTf =
             depends_on [ "aws_lambda_function_url.hello_lambda" ]
         }
 
-        output "hello_lambda_github_actions_deploy_role_arn" { value "aws_iam_role.hello_lambda_github_actions_deploy.arn" }
+        output "hello_lambda_github_actions_deploy_role_arn" { value_ (raw "aws_iam_role.hello_lambda_github_actions_deploy.arn") }
 
-        output "hello_lambda_execution_role_arn" { value "aws_iam_role.hello_lambda_execution.arn" }
+        output "hello_lambda_execution_role_arn" { value_ (raw "aws_iam_role.hello_lambda_execution.arn") }
 
-        output "hello_lambda_function_url" { value "aws_lambda_function_url.hello_lambda.function_url" }
+        output "hello_lambda_function_url" { value_ (raw "aws_lambda_function_url.hello_lambda.function_url") }
     }
 
 [<EntryPoint>]
