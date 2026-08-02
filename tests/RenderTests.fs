@@ -36,7 +36,7 @@ module RenderTests =
                 blockWithLabels "module" [ "my_module" ] {
                     attr "source" (str "./my-module")
 
-                    list_ "patterns" { item (str "infra/**") }
+                    list_ "patterns" [ str "infra/**" ]
                 }
             }
             |> document

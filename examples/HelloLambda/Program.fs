@@ -6,24 +6,9 @@ module HclHelper =
 
     let string key value = attr key (str value)
     let expr key value = attr key (raw value)
-    let hclString key value = attr key (raw $"\"{value}\"")
 
-    let stringItems values = values |> List.map (str >> item)
-
-    let hclStringValue value = raw $"\"{value}\""
-
-    let exprItems values = values |> List.map (raw >> item)
-
-    let hclStringItems values =
-        values |> List.map (hclStringValue >> item)
-
-    let stringList name values =
-        list_ name { yield! stringItems values }
-
-    let hclStringList name values =
-        list_ name { yield! hclStringItems values }
-
-    let exprList name values = list_ name { yield! exprItems values }
+    let stringList name values = list_ name (values |> Seq.map str)
+    let exprList name values = list_ name (values |> Seq.map raw)
 
     let hello_lambda_account_id value = string "hello_lambda_account_id" value
     let hello_lambda_repo value = string "hello_lambda_repo" value
@@ -39,8 +24,9 @@ module HclHelper =
     let thumbprint_list values = stringList "thumbprint_list" values
     let effect value = string "effect" value
     let actions values = stringList "actions" values
-    let resources values = stringList "resources" values
-    let hclStringResources values = hclStringList "resources" values
+    let resources values = list_ "resources" values
+    let identifiers values = list_ "identifiers" values
+    let values values = list_ "values" values
     let name value = string "name" value
     let assume_role_policy value = expr "assume_role_policy" value
     let role value = expr "role" value
@@ -54,6 +40,7 @@ module HclHelper =
     let function_url_auth_type value = string "function_url_auth_type" value
     let template_body value = attr "template_body" value
 
+    let aws = object_ "aws"
     let default_tags = block "default_tags"
 
     let statement = block "statement"
@@ -70,7 +57,7 @@ let mainTf =
             required_version ">= 1.15.0"
 
             required_providers {
-                object_ "aws" {
+                aws {
                     string "source" "hashicorp/aws"
                     string "version" "~> 6.0"
                 }
@@ -129,21 +116,19 @@ let helloLambdaTf =
 
                 principals {
                     string "type" "Federated"
-                    exprList "identifiers" [ "aws_iam_openid_connect_provider.github_actions.arn" ]
+                    identifiers [ raw "aws_iam_openid_connect_provider.github_actions.arn" ]
                 }
 
                 condition {
                     string "test" "StringEquals"
                     string "variable" "token.actions.githubusercontent.com:aud"
-                    stringList "values" [ "sts.amazonaws.com" ]
+                    values [ str "sts.amazonaws.com" ]
                 }
 
                 condition {
                     string "test" "StringLike"
                     string "variable" "token.actions.githubusercontent.com:sub"
-                    hclStringList "values" [
-                        "repo:${local.hello_lambda_repo}:ref:refs/heads/main"
-                    ]
+                    values [ templateStr "repo:${local.hello_lambda_repo}:ref:refs/heads/main" ]
                 }
             }
         }
@@ -159,15 +144,16 @@ let helloLambdaTf =
 
                 actions [ "lambda:GetFunction"; "lambda:CreateFunction"; "lambda:UpdateFunctionCode" ]
 
-                hclStringResources [
-                    "arn:aws:lambda:ap-northeast-1:${local.hello_lambda_account_id}:function:${local.hello_lambda_name}"
+                resources [
+                    templateStr
+                        "arn:aws:lambda:ap-northeast-1:${local.hello_lambda_account_id}:function:${local.hello_lambda_name}"
                 ]
             }
 
             statement {
                 effect "Allow"
                 actions [ "iam:PassRole" ]
-                exprList "resources" [ "aws_iam_role.hello_lambda_execution.arn" ]
+                resources [ raw "aws_iam_role.hello_lambda_execution.arn" ]
             }
         }
 
@@ -183,7 +169,7 @@ let helloLambdaTf =
                 actions [ "sts:AssumeRole" ]
                 principals {
                     string "type" "Service"
-                    stringList "identifiers" [ "lambda.amazonaws.com" ]
+                    identifiers [ str "lambda.amazonaws.com" ]
                 }
             }
         }

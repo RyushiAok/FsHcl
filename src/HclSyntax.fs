@@ -41,9 +41,9 @@ module Syntax =
     let object_ name =
         ContainerBuilder(fun body -> ObjectAssignment(name, body))
 
-    /// Creates a list assignment, for example `patterns = [ ... ]`.
-    let list_ name =
-        ContainerBuilder(fun body -> ListAssignment(name, body))
+    /// Creates a list assignment, for example `patterns = [ str "a"; str "b" ]`.
+    let list_ name (values: Value seq) =
+        ListAssignment(name, values |> Seq.map ListItem |> Seq.toList)
 
     /// Creates an HCL attribute.
     let attr key value = Attribute(key, value)
@@ -53,9 +53,6 @@ module Syntax =
         function
         | Some value -> Attribute(key, value)
         | None -> Empty
-
-    /// Creates a list item.
-    let item value = ListItem value
 
     /// Creates an unparsed HCL line.
     let rawLine value = RawLine value
