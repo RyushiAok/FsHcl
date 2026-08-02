@@ -15,7 +15,7 @@ module RenderTests =
     let ``renders typed values and raw expressions`` () =
         let result =
             hcl {
-                block "resource" {
+                block "resource" [] {
                     attr "name" (str "example")
                     attr "enabled" (bool true)
                     attr "count" (number 2m)
@@ -33,7 +33,7 @@ module RenderTests =
     let ``supports labelled blocks and list items`` () =
         let result =
             hcl {
-                blockWithLabels "module" [ "my_module" ] {
+                block "module" [ "my_module" ] {
                     attr "source" (str "./my-module")
 
                     list_ "patterns" [ str "infra/**" ]
@@ -48,7 +48,7 @@ module RenderTests =
     [<Fact>]
     let ``renders empty labelled block on one line`` () =
         let result =
-            hcl { blockWithLabels "data" [ "aws_caller_identity"; "current" ] { } }
+            hcl { block "data" [ "aws_caller_identity"; "current" ] { } }
             |> document
 
         result
@@ -56,7 +56,7 @@ module RenderTests =
 
     [<Fact>]
     let ``renders a block containing only omitted attributes on one line`` () =
-        hcl { block "feature" { optAttr "enabled" None } }
+        hcl { block "feature" [] { optAttr "enabled" None } }
         |> document
         |> should equal "feature {}\n"
 
@@ -64,7 +64,7 @@ module RenderTests =
     let ``renders jsonencode anonymous records`` () =
         let result =
             hcl {
-                block "resource" {
+                block "resource" [] {
                     attr
                         "template_body"
                         (jsonencode {|
@@ -90,7 +90,7 @@ module RenderTests =
     [<Fact>]
     let ``renders jsonencode sequences`` () =
         let result =
-            hcl { block "resource" { attr "values" (jsonencode [ "a"; "b" ]) } }
+            hcl { block "resource" [] { attr "values" (jsonencode [ "a"; "b" ]) } }
             |> document
 
         result |> should haveSubstring "values = jsonencode(["
@@ -108,7 +108,7 @@ module RenderTests =
 
         let result =
             hcl {
-                block "locals" {
+                block "locals" [] {
                     attr
                         "config"
                         (obj {
@@ -150,13 +150,13 @@ module RenderTests =
 
     [<Fact>]
     let ``renders empty list value`` () =
-        attr "items" (arr { () })
+        attr "items" (Value.List [])
         |> Render.node
         |> should equal "items = []\n"
 
     [<Fact>]
     let ``renders join separating nodes with blank lines`` () =
-        [ block "a" { attr "x" (number 1) }; block "b" { attr "y" (number 2) } ]
+        [ block "a" [] { attr "x" (number 1) }; block "b" [] { attr "y" (number 2) } ]
         |> Render.join
         |> should equal "a {\n  x = 1\n}\n\nb {\n  y = 2\n}\n"
 

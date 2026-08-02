@@ -29,12 +29,8 @@ module Syntax =
     /// HCL document computation expression.
     let hcl = BodyBuilder()
 
-    /// Creates an unlabeled HCL block.
-    let block name =
-        ContainerBuilder(fun body -> Block(name, [], body))
-
-    /// Creates an HCL block with string labels.
-    let blockWithLabels name labels =
+    /// Creates an HCL block with optional labels.
+    let block name (labels: string list) =
         ContainerBuilder(fun body -> Block(name, labels, body))
 
     /// Creates an object assignment, for example `variables = { ... }`.
@@ -43,7 +39,7 @@ module Syntax =
 
     /// Creates a list assignment, for example `patterns = [ str "a"; str "b" ]`.
     let list_ name (values: Value seq) =
-        ListAssignment(name, values |> Seq.map ListItem |> Seq.toList)
+        ListAssignment(name, values |> Seq.toList)
 
     /// Creates an HCL attribute.
     let attr key value = Attribute(key, value)

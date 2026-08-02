@@ -126,8 +126,18 @@ module Render =
 
             renderContainer options indent (header + "{") "}" body
         | ObjectAssignment(name, body) -> renderContainer options indent ($"{name} = {{") "}" body
-        | ListAssignment(name, body) -> renderContainer options indent ($"{name} = [") "]" body
-        | ListItem value -> [ $"{pad}{renderValueAt options indent value}," ]
+        | ListAssignment(name, values) ->
+            let childIndent = indent + options.indentSize
+
+            match values with
+            | [] -> [ $"{pad}{name} = []" ]
+            | values ->
+                let body =
+                    values
+                    |> List.map (fun value ->
+                        $"{padding childIndent}{renderValueAt options childIndent value},")
+
+                [ $"{pad}{name} = [" ] @ body @ [ $"{pad}]" ]
         | LineComment text -> [ $"{pad}# {text}" ]
         | BlockComment lines ->
             [ $"{pad}/*" ]

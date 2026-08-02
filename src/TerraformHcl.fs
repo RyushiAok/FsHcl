@@ -5,45 +5,45 @@ module TerraformHcl =
     open FsHcl.Hcl
 
     /// Creates a Terraform `terraform` block.
-    let terraform = block "terraform"
+    let terraform = block "terraform" []
 
     /// Creates a Terraform `provider` block.
-    let provider name = blockWithLabels "provider" [ name ]
+    let provider name = block "provider" [ name ]
 
     /// Creates a Terraform `resource` block.
     let resource typeName name =
-        blockWithLabels "resource" [ typeName; name ]
+        block "resource" [ typeName; name ]
 
     /// Creates a Terraform `data` block.
     let data sourceName name =
-        blockWithLabels "data" [ sourceName; name ]
+        block "data" [ sourceName; name ]
 
     /// Creates a Terraform `variable` block.
-    let variable name = blockWithLabels "variable" [ name ]
+    let variable name = block "variable" [ name ]
 
     /// Creates a Terraform `output` block.
-    let output name = blockWithLabels "output" [ name ]
+    let output name = block "output" [ name ]
 
     /// Creates a Terraform `locals` block.
-    let locals = block "locals"
+    let locals = block "locals" []
 
     /// Creates a Terraform `module` block.
-    let module_ name = blockWithLabels "module" [ name ]
+    let module_ name = block "module" [ name ]
 
     /// Creates a Terraform `import` block.
-    let import_ = block "import"
+    let import_ = block "import" []
 
     /// Creates a Terraform `moved` block.
-    let moved_ = block "moved"
+    let moved_ = block "moved" []
 
     /// Alias for `moved_`, useful when callers use the shorter term "move".
     let move_ = moved_
 
     /// Creates a Terraform `removed` block.
-    let removed_ = block "removed"
+    let removed_ = block "removed" []
 
     /// Creates a Terraform `check` block.
-    let check name = blockWithLabels "check" [ name ]
+    let check name = block "check" [ name ]
 
     /// Creates a Terraform `to` expression attribute, used by `import` and `moved`.
     let to_ value = attr "to" (raw value)
@@ -99,17 +99,17 @@ module TerraformHcl =
 
     /// Creates a `provisioner` block (e.g. `provisioner "local-exec" { ... }`).
     let provisioner typeName =
-        blockWithLabels "provisioner" [ typeName ]
+        block "provisioner" [ typeName ]
 
     /// Creates a `connection` block inside a resource or provisioner.
-    let connection = block "connection"
+    let connection = block "connection" []
 
     // ---------------------------------------------------------------
     // lifecycle block and its arguments
     // ---------------------------------------------------------------
 
     /// Creates a `lifecycle` block.
-    let lifecycle = block "lifecycle"
+    let lifecycle = block "lifecycle" []
 
     /// `create_before_destroy = true/false` inside a `lifecycle` block.
     let create_before_destroy value =
@@ -131,26 +131,26 @@ module TerraformHcl =
         attr "replace_triggered_by" (Value.List(refs |> List.map raw))
 
     /// Creates a `precondition` block (used in `lifecycle`, `output`, etc.).
-    let precondition = block "precondition"
+    let precondition = block "precondition" []
 
     /// Creates a `postcondition` block (used in `lifecycle`).
-    let postcondition = block "postcondition"
+    let postcondition = block "postcondition" []
 
     // ---------------------------------------------------------------
     // terraform block sub-blocks
     // ---------------------------------------------------------------
 
     /// Creates a `required_providers` block inside a `terraform` block.
-    let required_providers = block "required_providers"
+    let required_providers = block "required_providers" []
 
     /// Creates a `required_version` attribute inside a `terraform` block.
     let required_version value = attr "required_version" (str value)
 
     /// Creates a `backend` block inside a `terraform` block (e.g. `backend "s3" { ... }`).
-    let backend name = blockWithLabels "backend" [ name ]
+    let backend name = block "backend" [ name ]
 
     /// Creates a `cloud` block inside a `terraform` block.
-    let cloud = block "cloud"
+    let cloud = block "cloud" []
 
     // ---------------------------------------------------------------
     // variable / output common arguments
@@ -173,7 +173,7 @@ module TerraformHcl =
     let nullable value = attr "nullable" (bool value)
 
     /// Creates a `validation` block inside a variable block.
-    let validation = block "validation"
+    let validation = block "validation" []
 
     /// Creates a `value` attribute for an output block.
     let value_ value = attr "value" value

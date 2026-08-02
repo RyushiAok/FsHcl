@@ -31,8 +31,7 @@ type Node =
     | Attribute of key: string * value: Value
     | Block of name: string * labels: string list * body: Node list
     | ObjectAssignment of name: string * body: Node list
-    | ListAssignment of name: string * body: Node list
-    | ListItem of Value
+    | ListAssignment of name: string * values: Value list
     | LineComment of string
     | BlockComment of string list
     | RawLine of string

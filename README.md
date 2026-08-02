@@ -26,9 +26,7 @@ hcl {
     module_ "example" {
         attr "source" (str "./modules/example")
 
-        list_ "patterns" {
-            item (str "infra/**")
-        }
+        list_ "patterns" [ str "infra/**" ]
     }
 }
 |> document

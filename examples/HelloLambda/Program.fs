@@ -14,7 +14,7 @@ module HclHelper =
     let hello_lambda_repo value = string "hello_lambda_repo" value
     let hello_lambda_name value = string "hello_lambda_name" value
     let region value = string "region" value
-    let tags value = attr "tags" value
+    let tags value = attr "tags" (ofValue value)
     let awsApplication value = string "awsApplication" value
     let environment value = string "Environment" value
     let managedBy value = string "ManagedBy" value
@@ -41,12 +41,12 @@ module HclHelper =
     let template_body value = attr "template_body" value
 
     let aws = object_ "aws"
-    let default_tags = block "default_tags"
+    let default_tags = block "default_tags" []
 
-    let statement = block "statement"
+    let statement = block "statement" []
 
-    let principals = block "principals"
-    let condition = block "condition"
+    let principals = block "principals" []
+    let condition = block "condition" []
 
 open HclHelper
 
@@ -68,17 +68,13 @@ let mainTf =
             region "ap-northeast-1"
 
             default_tags {
-                tags (
-                    obj {
-                        stringField
-                            "awsApplication"
-                            "arn:aws:resource-groups:ap-northeast-1:123456789012:group/project-name-workspace-name/PLACEHOLDER"
-
-                        stringField "Environment" "workspace-name"
-                        stringField "ManagedBy" "terraform"
-                        stringField "Project" "project-name"
-                    }
-                )
+                tags {|
+                    awsApplication =
+                        "arn:aws:resource-groups:ap-northeast-1:123456789012:group/project-name-workspace-name/PLACEHOLDER"
+                    Environment = "workspace-name"
+                    ManagedBy = "terraform"
+                    Project = "project-name"
+                |}
             }
         }
 

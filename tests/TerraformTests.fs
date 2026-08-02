@@ -187,7 +187,7 @@ module TerraformHclTests =
                     cloud {
                         attr "organization" (str "my-org")
 
-                        block "workspaces" { attr "name" (str "production") }
+                        block "workspaces" [] { attr "name" (str "production") }
                     }
                 }
             }
@@ -254,7 +254,7 @@ module TerraformHclTests =
                     }
 
                     provisioner "remote-exec" {
-                        attr "inline" (arr { raw "echo hello" })
+                        attr "inline" (Value.List [ raw "echo hello" ])
                     }
                 }
             }

@@ -156,7 +156,7 @@ attr "config" (
 ### List Values
 
 ```fsharp
-attr "items" (arr { str "a"; str "b" })
+attr "items" (Value.List [ str "a"; str "b" ])
 // items = [
 //   "a",
 //   "b",
@@ -192,11 +192,11 @@ attr "body" (
 
 ```fsharp
 hcl {
-    block "locals" {
+    block "locals" [] {
         attr "region" (str "us-east-1")
     }
 
-    blockWithLabels "resource" [ "aws_s3_bucket"; "example" ] {
+    block "resource" [ "aws_s3_bucket"; "example" ] {
         attr "bucket" (str "my-bucket")
     }
 }
@@ -286,7 +286,7 @@ hcl {
 
 ```fsharp
 let options = { indentSize = 4; alignAttributes = false; trailingNewline = false }
-hcl { block "locals" { attr "x" (number 1) } } |> withOptions options
+hcl { block "locals" [] { attr "x" (number 1) } } |> withOptions options
 // locals {
 //     x = 1
 // }
@@ -511,6 +511,6 @@ Guidelines:
 
 - Wrap attributes that appear more than once across resources.
 - Use `str` for literal string values, `raw` for Terraform references — the helper makes this distinction explicit so callers don't need to think about it.
-- For repeated nested blocks (e.g. `statement`, `condition`), define thin `block` wrappers (`let statement = block "statement"`) rather than functions that hide the body.
+- For repeated nested blocks (e.g. `statement`, `condition`), define thin `block` wrappers (`let statement = block "statement" []`) rather than functions that hide the body.
 
 See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a full working example.

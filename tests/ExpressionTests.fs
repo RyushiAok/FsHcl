@@ -10,7 +10,7 @@ module CommentTests =
     let ``renders line comments`` () =
         hcl {
             comment "This is a comment"
-            block "resource" { attr "name" (str "example") }
+            block "resource" [] { attr "name" (str "example") }
         }
         |> document
         |> should haveSubstring "# This is a comment"
@@ -25,7 +25,7 @@ module CommentTests =
     let ``renders nested comments inside blocks`` () =
         let result =
             hcl {
-                block "resource" {
+                block "resource" [] {
                     comment "description of the attribute"
                     attr "name" (str "example")
                 }
@@ -48,7 +48,7 @@ module HeredocTests =
     [<Fact>]
     let ``renders indented heredoc strings`` () =
         let result =
-            hcl { block "resource" { attr "content" (heredocIndent "SCRIPT" "#!/bin/bash\necho hello") } }
+            hcl { block "resource" [] { attr "content" (heredocIndent "SCRIPT" "#!/bin/bash\necho hello") } }
             |> document
 
         result |> should haveSubstring "<<-SCRIPT"

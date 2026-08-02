@@ -175,17 +175,6 @@ module Values =
         member _.For(values: 'a seq, build: 'a -> (string * Value) list) =
             values |> Seq.collect build |> Seq.toList
 
-    type ListBuilder() =
-        member _.Yield(value: Value) = [ value ]
-        member _.YieldFrom(values: Value list) = values
-        member _.Combine(left, right: unit -> Value list) = left @ right ()
-        member _.Delay(build: unit -> Value list) = build
-        member _.Run(build: unit -> Value list) = Value.List(build ())
-        member _.Zero() : Value list = []
-
-        member _.For(values: 'a seq, build: 'a -> Value list) =
-            values |> Seq.collect build |> Seq.toList
-
     type ObjectFieldBuilder(key: string) =
         inherit ObjectBuilder()
 
@@ -193,9 +182,6 @@ module Values =
 
     /// HCL object value computation expression.
     let obj = ObjectBuilder()
-
-    /// HCL list value computation expression.
-    let arr = ListBuilder()
 
     /// Creates an object-valued field with a computation expression.
     let objField key = ObjectFieldBuilder(key)
