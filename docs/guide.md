@@ -24,6 +24,20 @@ attr "name" (templateStr "${var.prefix}-instance")
 // name = "${var.prefix}-instance"
 ```
 
+#### Tip: Extended string interpolation (F# 8+)
+
+When mixing F# interpolation with HCL's `${...}` or `%{...}` syntax,
+use [extended interpolated strings (FS-1132)](https://github.com/fsharp/fslang-design/blob/main/FSharp-8.0/FS-1132-better-interpolated-triple-quoted-strings.md)
+to avoid manual escaping.
+Prefix a triple-quoted string with `$$` so that single `{` and `%` are literal
+and `{{ }}` is used for F# interpolation:
+
+```fsharp
+let env = "prod"
+attr "greeting" (templateStr $$"""%{if var.name}Hello, ${var.name} ({{env}})%{endif}""")
+// greeting = "%{if var.name}Hello, ${var.name} (prod)%{endif}"
+```
+
 ### Numbers
 
 ```fsharp

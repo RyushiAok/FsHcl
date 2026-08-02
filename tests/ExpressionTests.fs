@@ -98,3 +98,20 @@ module TemplateAndExpressionTests =
         attr "filtered" (forObjectIf "k" "v" "var.items" "k" "v.value" "v.enabled")
         |> Render.node
         |> should equal "filtered = {for k, v in var.items : k => v.value if v.enabled}\n"
+
+    [<Fact>]
+    let ``extended interpolation (FS-1132) preserves HCL template directives`` () =
+        let env = "prod"
+
+        let result =
+            hcl {
+                attr "greeting" (templateStr $$"""%{if var.name}Hello, ${var.name} ({{env}})%{endif}""")
+                attr "items" (templateStr $$"""%{for ip in var.ips}${ip}%{endfor}""")
+            }
+            |> document
+
+        result
+        |> should haveSubstring "greeting = \"%{if var.name}Hello, ${var.name} (prod)%{endif}\""
+
+        result
+        |> should haveSubstring "items    = \"%{for ip in var.ips}${ip}%{endfor}\""
