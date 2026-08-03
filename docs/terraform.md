@@ -1,0 +1,197 @@
+---
+title: Terraform Helpers
+category: Documentation
+categoryindex: 1
+index: 4
+---
+
+# Terraform Helpers
+
+This page describes Terraform-specific helpers in FsHcl. These functions are available after you open `FsHcl.TerraformHcl`.
+
+```fsharp
+open FsHcl.Hcl
+open FsHcl.TerraformHcl
+```
+
+## Top-level Blocks
+
+These functions create standard Terraform block types.
+
+| Function                         | HCL Output                       |
+| -------------------------------- | -------------------------------- |
+| `terraform { ... }`              | `terraform { ... }`              |
+| `provider "aws" { ... }`         | `provider "aws" { ... }`         |
+| `resource "type" "name" { ... }` | `resource "type" "name" { ... }` |
+| `data "type" "name" { ... }`     | `data "type" "name" { ... }`     |
+| `variable "name" { ... }`        | `variable "name" { ... }`        |
+| `output "name" { ... }`          | `output "name" { ... }`          |
+| `locals { ... }`                 | `locals { ... }`                 |
+| `module_ "name" { ... }`         | `module "name" { ... }`          |
+| `import_ { ... }`                | `import { ... }`                 |
+| `moved_ { ... }`                 | `moved { ... }`                  |
+| `removed_ { ... }`               | `removed { ... }`                |
+| `check "name" { ... }`           | `check "name" { ... }`           |
+
+### import, moved, and removed
+
+Use `to_`, `from_`, and `id` inside these blocks.
+
+```fsharp
+hcl {
+    moved_ {
+        from_ "aws_s3_bucket.old"
+        to_ "aws_s3_bucket.new"
+    }
+
+    import_ {
+        to_ "aws_s3_bucket.existing"
+        id "my-bucket-name"
+    }
+}
+|> document
+// moved {
+//   from = aws_s3_bucket.old
+//   to   = aws_s3_bucket.new
+// }
+// import {
+//   to = aws_s3_bucket.existing
+//   id = "my-bucket-name"
+// }
+```
+
+## Dynamic Blocks
+
+| Function                                           | Description                            |
+| -------------------------------------------------- | -------------------------------------- |
+| `dynamic_ "name" "collection" { ... }`             | Dynamic block with `for_each` and `content` |
+| `dynamicWithIterator "name" "coll" "iter" { ... }` | Dynamic block with a custom iterator name   |
+
+The body becomes the inner `content` block automatically.
+
+```fsharp
+resource "aws_security_group" "example" {
+    dynamic_ "ingress" "var.rules" {
+        attr "from_port" (raw "ingress.value.port")
+        attr "to_port" (raw "ingress.value.port")
+        attr "protocol" (str "tcp")
+    }
+}
+// dynamic "ingress" {
+//   for_each = var.rules
+//   content {
+//     from_port = ingress.value.port
+//     to_port   = ingress.value.port
+//     protocol  = "tcp"
+//   }
+// }
+```
+
+## Meta-arguments
+
+| Function                     | HCL Output                        |
+| ---------------------------- | --------------------------------- |
+| `count (number 3)`           | `count = 3`                       |
+| `for_each (raw "…")`         | `for_each = …`                    |
+| `depends_on [r1; r2]`        | `depends_on = [\n  r1,\n  r2,\n]` |
+| `provider_ "aws.west"`       | `provider = aws.west`             |
+| `provisioner "type" { ... }` | `provisioner "type" { ... }`      |
+| `connection { ... }`         | `connection { ... }`              |
+
+## lifecycle Block
+
+Use `lifecycle` inside a resource block to configure lifecycle behavior.
+
+| Function                          | HCL Output                     |
+| --------------------------------- | ------------------------------ |
+| `lifecycle { ... }`               | `lifecycle { ... }`            |
+| `create_before_destroy true`      | `create_before_destroy = true` |
+| `prevent_destroy true`            | `prevent_destroy = true`       |
+| `ignore_changes ["tags"; "name"]` | `ignore_changes = [tags, name]` |
+| `ignore_changes_all`              | `ignore_changes = all`         |
+| `replace_triggered_by ["ref"]`    | `replace_triggered_by = [ref]` |
+| `precondition { ... }`            | `precondition { ... }`         |
+| `postcondition { ... }`           | `postcondition { ... }`        |
+
+```fsharp
+resource "aws_instance" "example" {
+    lifecycle {
+        create_before_destroy true
+        ignore_changes [ "tags" ]
+
+        precondition {
+            condition_ "var.instance_type != \"\""
+            error_message "instance_type must not be empty"
+        }
+    }
+}
+```
+
+## terraform Sub-blocks
+
+Use these functions inside a `terraform` block.
+
+| Function                     | HCL Output                    |
+| ---------------------------- | ----------------------------- |
+| `required_providers { ... }` | `required_providers { ... }`  |
+| `required_version ">= 1.6"` | `required_version = ">= 1.6"` |
+| `backend "s3" { ... }`       | `backend "s3" { ... }`        |
+| `cloud { ... }`              | `cloud { ... }`               |
+
+```fsharp
+terraform {
+    required_version ">= 1.6.0"
+
+    required_providers {
+        object_ "aws" {
+            attr "source" (str "hashicorp/aws")
+            attr "version" (str "~> 5.0")
+        }
+    }
+
+    backend "s3" {
+        attr "bucket" (str "my-state")
+    }
+}
+```
+
+## variable and output Arguments
+
+Use these functions inside `variable` or `output` blocks.
+
+| Function                 | HCL Output              |
+| ------------------------ | ----------------------- |
+| `type_ "string"`         | `type = string`         |
+| `default_ (str "value")` | `default = "value"`     |
+| `description "text"`     | `description = "text"`  |
+| `sensitive true`         | `sensitive = true`      |
+| `nullable false`         | `nullable = false`      |
+| `validation { ... }`     | `validation { ... }`    |
+| `value_ (raw "expr")`   | `value = expr`          |
+| `condition_ "expr"`      | `condition = expr`      |
+| `error_message "text"`   | `error_message = "text"` |
+
+### variable Example
+
+```fsharp
+variable "instance_type" {
+    type_ "string"
+    default_ (str "t3.micro")
+    description "EC2 instance type"
+
+    validation {
+        condition_ "contains([\"t3.micro\", \"t3.small\"], var.instance_type)"
+        error_message "Must be t3.micro or t3.small."
+    }
+}
+```
+
+### output Example
+
+```fsharp
+output "db_password" {
+    value_ (raw "aws_db_instance.main.password")
+    description "The database password"
+    sensitive true
+}
+```

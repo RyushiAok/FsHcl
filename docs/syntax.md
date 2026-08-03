@@ -1,0 +1,145 @@
+---
+title: Syntax
+category: Documentation
+categoryindex: 1
+index: 3
+---
+
+# Syntax
+
+This page describes blocks, attributes, and rendering in FsHcl.
+
+All examples assume the following open declaration:
+
+```fsharp
+open FsHcl.Hcl
+```
+
+## Blocks
+
+Use `block` to create a generic HCL block. Pass the block type, a list of labels, and a body.
+
+```fsharp
+hcl {
+    block "locals" [] {
+        attr "region" (str "us-east-1")
+    }
+
+    block "resource" [ "aws_s3_bucket"; "example" ] {
+        attr "bucket" (str "my-bucket")
+    }
+}
+|> document
+// locals {
+//   region = "us-east-1"
+// }
+// resource "aws_s3_bucket" "example" {
+//   bucket = "my-bucket"
+// }
+```
+
+## Attributes
+
+### attr
+
+`attr` sets a key-value pair inside a block.
+
+```fsharp
+attr "name" (str "example")
+```
+
+### optAttr
+
+`optAttr` sets an attribute only when the value is `Some`. FsHcl omits the attribute when the value is `None`.
+
+```fsharp
+optAttr "description" (Some (str "A resource"))  // included
+optAttr "deprecated" None                         // omitted
+```
+
+## Object Assignments
+
+`object_` creates a key-value assignment where the value is an object block.
+
+```fsharp
+object_ "variables" {
+    attr "region" (str "us-east-1")
+    attr "env" (str "prod")
+}
+// variables = {
+//   region = "us-east-1"
+//   env    = "prod"
+// }
+```
+
+## List Assignments
+
+`list_` creates a key-value assignment where the value is a list.
+
+```fsharp
+list_ "allowed_accounts" [
+    str "111111111111"
+    str "222222222222"
+]
+// allowed_accounts = [
+//   "111111111111",
+//   "222222222222",
+// ]
+```
+
+## Comments
+
+`comment` creates a single-line comment. `blockComment` creates a multi-line comment.
+
+```fsharp
+comment "Line comment"
+blockComment [ "Multi-line"; "block comment" ]
+// # Line comment
+// /*
+// Multi-line
+// block comment
+// */
+```
+
+## Loops
+
+Use F# `for` expressions inside the `hcl` computation expression.
+
+```fsharp
+hcl {
+    for region in [ "us-east-1"; "eu-west-1" ] do
+        attr region (str region)
+}
+|> document
+// us-east-1 = "us-east-1"
+// eu-west-1 = "eu-west-1"
+```
+
+## Rendering
+
+### Render Functions
+
+| Function      | Description                          |
+| ------------- | ------------------------------------ |
+| `document`    | Render with default options          |
+| `Render.node` | Render a single node                 |
+| `Render.join` | Render nodes with blank line between |
+| `withOptions` | Render with custom options           |
+
+### RenderOptions
+
+| Option            | Default | Description                      |
+| ----------------- | ------- | -------------------------------- |
+| `indentSize`      | `2`     | Spaces per indent level          |
+| `alignAttributes` | `true`  | Pad attribute keys to equal width |
+| `trailingNewline` | `true`  | Append newline at end of output  |
+
+### Custom Options Example
+
+```fsharp
+let options = { indentSize = 4; alignAttributes = false; trailingNewline = false }
+hcl { block "locals" [] { attr "x" (number 1) } } |> withOptions options
+// locals {
+//     x = 1
+// }
+```

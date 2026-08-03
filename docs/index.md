@@ -1,6 +1,14 @@
+---
+title: FsHcl
+category: Documentation
+categoryindex: 1
+index: 0
+---
+
 # FsHcl
 
-A typed HCL generation DSL for F#.
+FsHcl is a typed DSL that generates HCL code from F#.
+You write Terraform configurations with computation expressions. FsHcl renders the output to valid `.tf` syntax.
 
 ## Installation
 
@@ -8,7 +16,7 @@ A typed HCL generation DSL for F#.
 dotnet add package FsHcl
 ```
 
-## Quick Start
+## Minimal Example
 
 ```fsharp
 open FsHcl.Hcl
@@ -19,7 +27,7 @@ hcl {
         attr "bucket" (str "my-bucket")
 
         attr "tags" (ofRecord {|
-            Environment = "production";
+            Environment = "production"
             ManagedBy = "terraform"
         |})
     }
@@ -47,23 +55,14 @@ output "bucket_arn" {
 }
 ```
 
-## Project-Specific Helpers
+## Documentation
 
-Define thin wrapper functions to avoid repeating `attr "key" (str "value")`:
+- [Getting Started](getting-started.html) — Install FsHcl and generate your first resource
+- [Values](values.html) — All value types: strings, numbers, objects, lists, and CLR conversion
+- [Syntax](syntax.html) — Blocks, attributes, comments, loops, and render options
+- [Terraform Helpers](terraform.html) — Terraform-specific block builders and meta-arguments
+- [Patterns](patterns.html) — Project-specific helper functions and best practices
 
-```fsharp
-let name value = attr "name" (str value)
-let role value = attr "role" (raw value)
+## Examples
 
-hcl {
-    resource "aws_iam_role" "deploy" {
-        name "github-actions-deploy"
-        role "data.aws_iam_policy_document.assume.json"
-    }
-}
-|> document
-```
-
-See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a full working example.
-
-Read the [Usage Guide](guide.html) for all available functions.
+See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a complete working example.

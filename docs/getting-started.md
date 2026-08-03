@@ -1,0 +1,98 @@
+---
+title: Getting Started
+category: Documentation
+categoryindex: 1
+index: 1
+---
+
+# Getting Started
+
+This guide shows you how to install FsHcl and generate your first Terraform resource.
+
+## Prerequisites
+
+- .NET SDK 6.0 or later
+
+## Step 1: Add the Package
+
+Run this command in your project directory:
+
+```bash
+dotnet add package FsHcl
+```
+
+## Step 2: Open the Namespaces
+
+Add these `open` declarations at the top of your F# file:
+
+```fsharp
+open FsHcl.Hcl
+open FsHcl.TerraformHcl
+```
+
+- `FsHcl.Hcl` provides the core DSL: values, attributes, blocks, and rendering.
+- `FsHcl.TerraformHcl` provides Terraform-specific helpers: `resource`, `data`, `variable`, `output`, and more.
+
+## Step 3: Define a Resource
+
+Use the `hcl` computation expression to define blocks. Each block contains attributes.
+
+```fsharp
+let config =
+    hcl {
+        resource "aws_s3_bucket" "my_bucket" {
+            attr "bucket" (str "my-app-data")
+
+            attr "tags" (ofRecord {|
+                Environment = "dev"
+                ManagedBy = "terraform"
+            |})
+        }
+    }
+```
+
+- `resource "type" "name" { ... }` creates a Terraform resource block.
+- `attr "key" value` sets an attribute.
+- `str "text"` creates a string value.
+- `ofRecord {| ... |}` converts an F# anonymous record to an HCL object.
+
+## Step 4: Render the Output
+
+Pipe the result to `document` to produce HCL text:
+
+```fsharp
+let hclText = config |> document
+printfn "%s" hclText
+```
+
+This prints:
+
+```hcl
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-app-data"
+
+  tags = {
+    Environment = "dev"
+    ManagedBy   = "terraform"
+  }
+}
+```
+
+## Step 5: Write to a File
+
+Save the output to a `.tf` file:
+
+```fsharp
+open System.IO
+
+File.WriteAllText("main.tf", config |> document)
+```
+
+Terraform reads this file directly. No extra build step is necessary.
+
+## Next Steps
+
+- [Values](values.html) — Learn all available value types
+- [Syntax](syntax.html) — Learn about blocks, attributes, and render options
+- [Terraform Helpers](terraform.html) — See Terraform-specific block builders
+- [Patterns](patterns.html) — Define project-specific helper functions
