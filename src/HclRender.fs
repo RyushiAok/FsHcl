@@ -24,6 +24,20 @@ module Render =
             | [] -> 0
             | widths -> List.max widths
 
+    /// Splits nodes into groups separated by Blank lines,
+    /// pairing each node with its group's max attribute key width.
+    let private withGroupMaxKey nodes =
+        let rec split acc current =
+            function
+            | [] -> List.rev (List.rev current :: acc)
+            | Blank :: rest -> split (List.rev (Blank :: current) :: acc) [] rest
+            | node :: rest -> split acc (node :: current) rest
+
+        split [] [] nodes
+        |> List.collect (fun group ->
+            let maxKey = maxKeyWidth group
+            group |> List.map (fun node -> (node, maxKey)))
+
     let rec private renderFields options indent fields =
         let maxKey =
             if options.alignAttributes then
@@ -95,11 +109,11 @@ module Render =
     let rec private renderContainer options indent opener closer body =
         let pad = padding indent
         let childIndent = indent + options.indentSize
-        let childMaxKey = maxKeyWidth body
 
         let renderedBody =
             body
-            |> List.collect (renderNode options childIndent childMaxKey)
+            |> withGroupMaxKey
+            |> List.collect (fun (node, maxKey) -> renderNode options childIndent maxKey node)
 
         match renderedBody with
         | [] -> [ $"{pad}{opener}{closer}" ]
@@ -155,7 +169,8 @@ module Render =
 
         let rendered =
             nodes
-            |> List.collect (renderNode options 0 (maxKeyWidth nodes))
+            |> withGroupMaxKey
+            |> List.collect (fun (node, maxKey) -> renderNode options 0 maxKey node)
             |> String.concat "\n"
 
         if options.trailingNewline then

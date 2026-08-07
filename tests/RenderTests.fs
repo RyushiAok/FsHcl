@@ -173,3 +173,22 @@ module RenderTests =
 
         result |> should haveSubstring "alpha = \"alpha\""
         result |> should haveSubstring "beta  = \"beta\""
+
+    [<Fact>]
+    let ``aligns attributes per group separated by blank lines`` () =
+        let result =
+            hcl {
+                block "resource" [ "aws_instance"; "web" ] {
+                    attr "ami" (str "abc-123")
+                    attr "instance_type" (str "t2.micro")
+                    blank
+                    attr "availability_zone" (str "us-west-2a")
+                    attr "key_name" (str "my-key")
+                }
+            }
+            |> document
+
+        result |> should haveSubstring "ami           = \"abc-123\""
+        result |> should haveSubstring "instance_type = \"t2.micro\""
+        result |> should haveSubstring "availability_zone = \"us-west-2a\""
+        result |> should haveSubstring "key_name          = \"my-key\""
