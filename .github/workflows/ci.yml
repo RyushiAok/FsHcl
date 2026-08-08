@@ -34,3 +34,17 @@ jobs:
 
       - name: Pack
         run: dotnet pack FsHcl.fsproj --configuration Release --no-restore --no-build --output artifacts
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
+      - name: Docs build
+        working-directory: docs
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build

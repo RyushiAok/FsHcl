@@ -1,6 +1,13 @@
 bin/
 obj/
 artifacts/
+
+# fsdocs (legacy)
+.fsdocs/
 output/
 tmp/
-.fsdocs/
+
+# Docs site
+docs/node_modules/
+docs/build/
+docs/.react-router/

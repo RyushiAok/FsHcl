@@ -18,25 +18,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-      - run: dotnet tool restore
-      - run: dotnet build -c Release FsHcl.fsproj
-      - run: dotnet fsdocs build --properties Configuration=Release
-      - name: Generate sitemap
-        run: |
-          cp docs/robots.txt ./output/robots.txt
-          cp docs/google338969153909947f.html ./output/google338969153909947f.html
-          BASE_URL="https://ryushiaok.github.io/FsHcl"
-          echo '<?xml version="1.0" encoding="UTF-8"?>' > ./output/sitemap.xml
-          echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> ./output/sitemap.xml
-          for f in $(find ./output -name '*.html' | sort); do
-            path="${f#./output}"
-            echo "  <url><loc>${BASE_URL}${path}</loc></url>" >> ./output/sitemap.xml
-          done
-          echo '</urlset>' >> ./output/sitemap.xml
-      - uses: actions/upload-pages-artifact@v3
+      - uses: pnpm/action-setup@v4
         with:
-          path: ./output
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
+      - name: Install dependencies
+        working-directory: docs
+        run: pnpm install --frozen-lockfile
+      - name: Build docs
+        working-directory: docs
+        run: pnpm build
+      - name: Prepare deploy
+        working-directory: docs/build/client
+        run: |
+          cp -r assets FsHcl/
+          cp __spa-fallback.html FsHcl/404.html
+          cp robots.txt FsHcl/
+          cp google338969153909947f.html FsHcl/
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs/build/client/FsHcl
 
   deploy:
     runs-on: ubuntu-latest

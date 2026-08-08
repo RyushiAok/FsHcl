@@ -16,8 +16,6 @@
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>https://github.com/RyushiAok/FsHcl/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://ryushiaok.github.io/FsHcl</PackageProjectUrl>
-    <FsDocsLicenseLink>https://github.com/RyushiAok/FsHcl/blob/main/LICENSE</FsDocsLicenseLink>
-    <FsDocsReleaseNotesLink>https://github.com/RyushiAok/FsHcl/releases</FsDocsReleaseNotesLink>
   </PropertyGroup>
 
   <ItemGroup>
