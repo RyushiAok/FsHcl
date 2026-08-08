@@ -46,3 +46,12 @@ export const linkActive = style([
     fontWeight: 500,
   },
 ]);
+
+export const sectionHeading = style({
+  fontSize: fontSize.xs,
+  fontWeight: 600,
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+  color: color.textMuted,
+  padding: `${space[7]} 0.625rem ${space[3]}`,
+});

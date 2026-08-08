@@ -10,5 +10,10 @@ export default {
     "/syntax",
     "/terraform",
     "/patterns",
+    "/api-types",
+    "/api-values",
+    "/api-syntax",
+    "/api-render",
+    "/api-terraform",
   ],
 } satisfies Config;

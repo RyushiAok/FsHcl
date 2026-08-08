@@ -6,12 +6,13 @@ import {
 import { Heading } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
-import { navItems } from "~/ui/sidebar";
+import { navSections } from "~/ui/sidebar";
 import {
   backdrop,
   drawer,
   drawerLink,
   drawerLinkActive,
+  drawerSectionHeading,
   headerInner,
   headerRight,
   headerStyle,
@@ -64,21 +65,28 @@ export const Header = () => {
         onClick={() => setOpen(false)}
       />
       <nav className={drawer[open ? "open" : "closed"]}>
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {navItems.map(({ to, label }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                viewTransition
-                className={({ isActive }) =>
-                  isActive ? drawerLinkActive : drawerLink
-                }
-              >
-                {label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+        {navSections.map((section, i) => (
+          <div key={i}>
+            {section.title && (
+              <div className={drawerSectionHeading}>{section.title}</div>
+            )}
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {section.items.map(({ to, label }) => (
+                <li key={to}>
+                  <NavLink
+                    to={to}
+                    viewTransition
+                    className={({ isActive }) =>
+                      isActive ? drawerLinkActive : drawerLink
+                    }
+                  >
+                    {label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </nav>
     </>
   );

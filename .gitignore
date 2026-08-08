@@ -2,10 +2,15 @@ bin/
 obj/
 artifacts/
 
-# fsdocs (legacy)
+# FSDocs
 .fsdocs/
+.fsdocs-input/
+.fsdocs-out/
 output/
 tmp/
+
+# Generated API docs
+docs/app/content/api-*.mdx
 
 # Docs site
 docs/node_modules/

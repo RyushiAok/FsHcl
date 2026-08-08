@@ -18,7 +18,13 @@ export const headerInner = style({
   alignItems: "center",
   justifyContent: "space-between",
   flex: 1,
-  padding: "0 0.75rem",
+  padding: `0 ${space[5]}`,
+  "@media": {
+    [breakpoint.sidebar]: {
+      paddingLeft: "1.375rem",
+      paddingRight: "1.375rem",
+    },
+  },
 });
 
 export const headerRight = style({
@@ -111,3 +117,12 @@ export const drawerLinkActive = style([
     fontWeight: 500,
   },
 ]);
+
+export const drawerSectionHeading = style({
+  fontSize: fontSize.xs,
+  fontWeight: 600,
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+  color: color.textMuted,
+  padding: `${space[7]} ${space[5]} ${space[3]}`,
+});
