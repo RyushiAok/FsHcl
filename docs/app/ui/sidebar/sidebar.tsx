@@ -16,6 +16,7 @@ export const Sidebar = () => (
         <li key={to}>
           <NavLink
             to={to}
+            viewTransition
             className={({ isActive }) => (isActive ? s.linkActive : s.link)}
           >
             {label}

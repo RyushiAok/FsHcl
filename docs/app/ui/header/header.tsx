@@ -7,10 +7,11 @@ import { Heading } from "@radix-ui/themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { navItems } from "~/ui/sidebar";
-import { link, linkActive } from "~/ui/sidebar/sidebar-style.css";
 import {
   backdrop,
   drawer,
+  drawerLink,
+  drawerLinkActive,
   headerInner,
   headerRight,
   headerStyle,
@@ -50,8 +51,8 @@ export const Header = () => {
     <>
       <header className={headerStyle[visible || open ? "visible" : "hidden"]}>
         <div className={headerInner}>
-          <Link to="/" className={logoLink}>
-            <Heading size="3">FsHcl</Heading>
+          <Link to="/" className={logoLink} viewTransition>
+            <Heading size="4">FsHcl</Heading>
           </Link>
           <div className={headerRight}>
             <a
@@ -87,7 +88,10 @@ export const Header = () => {
             <li key={to}>
               <NavLink
                 to={to}
-                className={({ isActive }) => (isActive ? linkActive : link)}
+                viewTransition
+                className={({ isActive }) =>
+                  isActive ? drawerLinkActive : drawerLink
+                }
               >
                 {label}
               </NavLink>

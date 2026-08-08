@@ -1,5 +1,5 @@
 import { style, styleVariants } from "@vanilla-extract/css";
-import { breakpoint, color } from "~/ui/tokens";
+import { breakpoint, color, fontSize, space } from "~/ui/tokens";
 
 const baseStyle = style({
   position: "fixed",
@@ -37,7 +37,7 @@ export const headerInner = style({
   alignItems: "center",
   justifyContent: "space-between",
   flex: 1,
-  padding: "0 1rem",
+  padding: "0 0.75rem",
 });
 
 export const headerRight = style({
@@ -108,3 +108,25 @@ export const backdrop = styleVariants({
   open: [backdropBase, { opacity: 1 }],
   closed: [backdropBase, { opacity: 0, pointerEvents: "none" }],
 });
+
+export const drawerLink = style({
+  display: "block",
+  padding: `${space[4]} ${space[5]}`,
+  borderRadius: space[2],
+  textDecoration: "none",
+  fontSize: fontSize.base,
+  color: color.text,
+  transition: "color 0.15s, background-color 0.15s",
+  ":hover": {
+    color: color.textEmphasis,
+  },
+});
+
+export const drawerLinkActive = style([
+  drawerLink,
+  {
+    backgroundColor: color.bgActive,
+    color: color.textEmphasis,
+    fontWeight: 500,
+  },
+]);

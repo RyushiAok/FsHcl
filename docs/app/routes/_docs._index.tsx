@@ -28,7 +28,7 @@ export default function Landing({ loaderData }: { loaderData: Awaited<ReturnType
           <Heading size="8" className={heroTitle}>
             FsHcl
           </Heading>
-          <Text size="4" className={heroSubtitle}>
+          <Text size="3" className={heroSubtitle}>
             A typed DSL that generates HCL / Terraform code from F#.
           </Text>
         </Flex>
