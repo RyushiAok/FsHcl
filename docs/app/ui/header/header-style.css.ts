@@ -1,7 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 import { breakpoint, color, fontSize, space } from "~/ui/tokens";
 
-const baseStyle = style({
+export const headerStyle = style({
   position: "fixed",
   height: "var(--header-height)",
   display: "flex",
@@ -11,25 +11,6 @@ const baseStyle = style({
   left: 0,
   right: 0,
   zIndex: 1000,
-  overscrollBehaviorY: "contain",
-  transition: "visibility 0.2s, opacity 0.2s",
-});
-
-export const headerStyle = styleVariants({
-  hidden: [
-    baseStyle,
-    {
-      visibility: "hidden",
-      opacity: 0,
-    },
-  ],
-  visible: [
-    baseStyle,
-    {
-      visibility: "visible",
-      opacity: 1,
-    },
-  ],
 });
 
 export const headerInner = style({

@@ -4,7 +4,7 @@ import {
   HamburgerMenuIcon,
 } from "@radix-ui/react-icons";
 import { Heading } from "@radix-ui/themes";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { navItems } from "~/ui/sidebar";
 import {
@@ -20,26 +20,7 @@ import {
   menuButton,
 } from "./header-style.css";
 
-function useScrollDirection() {
-  const [visible, setVisible] = useState(true);
-  const lastY = useRef(0);
-
-  const onScroll = useCallback(() => {
-    const y = window.scrollY;
-    setVisible(y <= 0 || y < lastY.current);
-    lastY.current = y;
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [onScroll]);
-
-  return visible;
-}
-
 export const Header = () => {
-  const visible = useScrollDirection();
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
@@ -49,7 +30,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className={headerStyle[visible || open ? "visible" : "hidden"]}>
+      <header className={headerStyle}>
         <div className={headerInner}>
           <Link to="/" className={logoLink} viewTransition>
             <Heading size="4">FsHcl</Heading>
