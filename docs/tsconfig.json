@@ -2,6 +2,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "../scripts/*.mts",
     ".react-router/types/**/*"
   ],
   "compilerOptions": {
@@ -16,9 +17,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "paths": {
-      "~/*": ["./app/*"]
-    },
+    "types": ["node"],
+    "paths": { "~/*": ["./app/*"] },
     "rootDirs": [".", ".react-router/types"]
   }
 }

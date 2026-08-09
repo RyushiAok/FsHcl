@@ -3,23 +3,22 @@ import {
   GitHubLogoIcon,
   HamburgerMenuIcon,
 } from "@radix-ui/react-icons";
-import { Heading } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router";
-import { navSections } from "~/ui/sidebar";
+import { Link, useLocation } from "react-router";
+import { NavTree } from "~/ui/nav";
 import {
   backdrop,
   drawer,
-  drawerLink,
-  drawerLinkActive,
-  drawerSectionHeading,
   headerInner,
   headerRight,
   headerStyle,
   iconLink,
   logoLink,
+  logoTitle,
   menuButton,
 } from "./header-style.css";
+
+const drawerId = "mobile-navigation";
 
 export const Header = () => {
   const [open, setOpen] = useState(false);
@@ -29,12 +28,26 @@ export const Header = () => {
     setOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    if (open) document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
   return (
     <>
       <header className={headerStyle}>
         <div className={headerInner}>
           <Link to="/" className={logoLink} viewTransition>
-            <Heading size="4">FsHcl</Heading>
+            <span className={logoTitle}>FsHcl</span>
           </Link>
           <div className={headerRight}>
             <a
@@ -42,13 +55,17 @@ export const Header = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={iconLink}
+              aria-label="FsHcl on GitHub"
             >
               <GitHubLogoIcon width="1.5em" height="1.5em" />
             </a>
             <button
               className={menuButton}
-              onClick={() => setOpen((v) => !v)}
-              aria-label="Menu"
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-controls={drawerId}
+              aria-expanded={open}
             >
               {open ? (
                 <Cross1Icon width="1.25em" height="1.25em" />
@@ -63,30 +80,16 @@ export const Header = () => {
       <div
         className={backdrop[open ? "open" : "closed"]}
         onClick={() => setOpen(false)}
+        aria-hidden="true"
       />
-      <nav className={drawer[open ? "open" : "closed"]}>
-        {navSections.map((section, i) => (
-          <div key={i}>
-            {section.title && (
-              <div className={drawerSectionHeading}>{section.title}</div>
-            )}
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {section.items.map(({ to, label }) => (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    viewTransition
-                    className={({ isActive }) =>
-                      isActive ? drawerLinkActive : drawerLink
-                    }
-                  >
-                    {label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <nav
+        id={drawerId}
+        className={drawer[open ? "open" : "closed"]}
+        aria-label="Documentation"
+        aria-hidden={!open}
+        inert={!open}
+      >
+        <NavTree pathname={location.pathname} variant="drawer" />
       </nav>
     </>
   );

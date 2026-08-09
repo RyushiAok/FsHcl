@@ -1,4 +1,3 @@
-import { Flex, Heading, Text } from "@radix-ui/themes";
 import { getDoc } from "~/content/mdx.server";
 import { MdxContent } from "~/ui/mdx/mdx-components";
 import { article } from "~/ui/mdx/mdx-style.css";
@@ -24,14 +23,12 @@ export default function Landing({ loaderData }: { loaderData: Awaited<ReturnType
   return (
     <>
       <article className={article}>
-        <Flex direction="column" gap="1" className={heroSection}>
-          <Heading size="8" className={heroTitle}>
-            FsHcl
-          </Heading>
-          <Text size="3" className={heroSubtitle}>
+        <div className={heroSection}>
+          <h1 className={heroTitle}>FsHcl</h1>
+          <div className={heroSubtitle}>
             A typed DSL that generates HCL / Terraform code from F#.
-          </Text>
-        </Flex>
+          </div>
+        </div>
         <MdxContent code={code} />
       </article>
       <TableOfContents entries={toc} />

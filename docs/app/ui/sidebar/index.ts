@@ -1,1 +1,1 @@
-export { navItems, navSections, Sidebar } from "./sidebar";
+export { Sidebar } from "./sidebar";

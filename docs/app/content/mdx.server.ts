@@ -20,6 +20,8 @@ export interface DocMeta {
   slug: string;
   title: string;
   description: string;
+  namespace?: string;
+  showTitle: boolean;
 }
 
 function extractText(node: Element): string {
@@ -35,7 +37,7 @@ function rehypeExtractToc(toc: TocEntry[]): Plugin<[], Root> {
   return () => (tree) => {
     for (const node of tree.children) {
       if (node.type !== "element") continue;
-      const m = node.tagName.match(/^h([23])$/);
+      const m = node.tagName.match(/^h([1-4])$/);
       if (!m) continue;
       const id = (node.properties?.id as string) ?? "";
       const text = extractText(node);
@@ -44,8 +46,30 @@ function rehypeExtractToc(toc: TocEntry[]): Plugin<[], Root> {
   };
 }
 
+async function resolveSlug(slug: string): Promise<string> {
+  const direct = path.join(contentDir, `${slug}.mdx`);
+  try {
+    await fs.access(direct);
+    return direct;
+  } catch {
+    // search subdirectories
+  }
+  const entries = await fs.readdir(contentDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const nested = path.join(contentDir, entry.name, `${slug}.mdx`);
+    try {
+      await fs.access(nested);
+      return nested;
+    } catch {
+      continue;
+    }
+  }
+  throw new Error(`MDX not found: ${slug}`);
+}
+
 export async function getDoc(slug: string) {
-  const filePath = path.join(contentDir, `${slug}.mdx`);
+  const filePath = await resolveSlug(slug);
   const raw = await fs.readFile(filePath, "utf-8");
   const { data, content } = matter(raw);
 
@@ -61,18 +85,26 @@ export async function getDoc(slug: string) {
         {
           theme: "github-dark-default",
           defaultColor: false,
-          langs: ["fsharp", "hcl", "bash", "json", "xml"],
+          langs: ["fsharp", "hcl", "bash", "json", "xml", "csharp"],
         },
       ],
       rehypeExtractToc(toc),
     ],
   });
 
+  const title = data.title as string;
+  const showTitle = (data.showTitle as boolean | undefined) ?? true;
+  if (showTitle) {
+    toc.unshift({ id: "top", text: title, depth: 1 });
+  }
+
   return {
     meta: {
       slug,
-      title: data.title as string,
+      title,
       description: (data.description as string) ?? "",
+      namespace: (data.namespace as string) ?? undefined,
+      showTitle,
     },
     code: String(compiled),
     toc,
@@ -80,8 +112,17 @@ export async function getDoc(slug: string) {
 }
 
 export async function getAllSlugs(): Promise<string[]> {
-  const files = await fs.readdir(contentDir);
-  return files
-    .filter((f) => f.endsWith(".mdx"))
-    .map((f) => f.replace(/\.mdx$/, ""));
+  const slugs: string[] = [];
+  const entries = await fs.readdir(contentDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isFile() && entry.name.endsWith(".mdx")) {
+      slugs.push(entry.name.replace(/\.mdx$/, ""));
+    } else if (entry.isDirectory()) {
+      const nested = await fs.readdir(path.join(contentDir, entry.name));
+      for (const f of nested) {
+        if (f.endsWith(".mdx")) slugs.push(f.replace(/\.mdx$/, ""));
+      }
+    }
+  }
+  return slugs;
 }
