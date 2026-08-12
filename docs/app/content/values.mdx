@@ -29,7 +29,7 @@ attr "name" (templateStr "${var.prefix}-instance")
 
 ### Extended String Interpolation (F# 8+)
 
-Use extended interpolated strings (FS-1132) when you mix F# interpolation with HCL `${...}` or `%{...}` syntax. Prefix a triple-quoted string with `$$`. Single `{` and `%` become literal characters. Use `{{ }}` for F# interpolation.
+Use extended interpolated strings (FS-1132) to mix F# interpolation with HCL `${...}` or `%{...}` syntax. Prefix a triple-quoted string with `$$`. Single `{` and `%` become literal characters. Use `{{ }}` for F# interpolation.
 
 ```fsharp
 let env = "prod"

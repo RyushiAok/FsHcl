@@ -1,0 +1,91 @@
+---
+title: "Render"
+description: "HCL rendering functions."
+namespace: "FsHcl.Hcl"
+---
+
+HCL rendering functions.
+
+| Function | Description |
+| --- | --- |
+| `defaults` | Default Terraform-style rendering options. |
+| `document nodes` | Renders an HCL document with default options. |
+| `join nodes` | Renders top-level nodes separated by a blank line. |
+| `node value` | Renders a single HCL node with default options. |
+| `withOptions options nodes` | Renders an HCL document with explicit options. |
+
+## defaults
+
+```fsharp
+defaults
+```
+
+Default Terraform-style rendering options.
+
+**Returns** `RenderOptions`
+
+---
+
+## document
+
+```fsharp
+document nodes
+```
+
+Renders an HCL document with default options.
+
+**Parameters**
+
+- `nodes` : `Node list`
+
+**Returns** `string`
+
+---
+
+## join
+
+```fsharp
+join nodes
+```
+
+Renders top-level nodes separated by a blank line.
+
+**Parameters**
+
+- `nodes` : `Node list`
+
+**Returns** `string`
+
+---
+
+## node
+
+```fsharp
+node value
+```
+
+Renders a single HCL node with default options.
+
+**Parameters**
+
+- `value` : `Node`
+
+**Returns** `string`
+
+---
+
+## withOptions
+
+```fsharp
+withOptions options nodes
+```
+
+Renders an HCL document with explicit options.
+
+**Parameters**
+
+- `options` : `RenderOptions`
+- `nodes` : `Node list`
+
+**Returns** `string`
+

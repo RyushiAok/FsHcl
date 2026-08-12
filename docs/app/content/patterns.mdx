@@ -1,11 +1,11 @@
 ---
 title: Patterns
-description: Recommended patterns and best practices for FsHcl projects.
+description: Common patterns for FsHcl projects.
 ---
 
 ## Define Project-Specific Helpers
 
-Wrap `attr`, `str`, and `raw` in short functions. These helpers remove repetition and make the code easier to read.
+Wrap `attr`, `str`, and `raw` in short functions. These helpers remove repetition in configuration definitions.
 
 ```fsharp
 module MyProject =
@@ -17,7 +17,7 @@ module MyProject =
     let function_name value = attr "function_name" (raw value)
 ```
 
-Use these helpers in your configuration:
+Example with project-specific helpers:
 
 ```fsharp
 open MyProject
@@ -83,4 +83,4 @@ resource "aws_iam_policy_document" "example" {
 
 ## Complete Example
 
-See [examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) for a full project that uses these patterns.
+[examples/HelloLambda](https://github.com/ryushiaok/FsHcl/tree/main/examples/HelloLambda) is a full project that uses these patterns.

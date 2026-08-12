@@ -1,0 +1,727 @@
+---
+title: "TerraformHcl"
+description: "Terraform-specific block and attribute helpers."
+namespace: "FsHcl"
+---
+
+Terraform syntax helpers layered on the generic HCL DSL.
+
+| Function | Description |
+| --- | --- |
+| `backend name` | Creates a `backend` block inside a `terraform` block (e.g. `backend "s3" { ... }`). |
+| `check name` | Creates a Terraform `check` block. |
+| `cloud` | Creates a `cloud` block inside a `terraform` block. |
+| `condition_ value` | Creates a `condition` attribute (used in `validation`, `precondition`, etc.). |
+| `connection` | Creates a `connection` block inside a resource or provisioner. |
+| `count value` | Creates a `count` meta-argument. |
+| `create_before_destroy value` | `create_before_destroy = true/false` inside a `lifecycle` block. |
+| `data sourceName name` | Creates a Terraform `data` block. |
+| `default_ value` | Creates a `default` attribute for a variable block. |
+| `depends_on refs` | Creates a `depends_on` meta-argument from a list of references. |
+| `description value` | Creates a `description` string attribute. |
+| `dynamicWithIterator name forEach iterator` | Creates a Terraform `dynamic` block with a custom `iterator` name. |
+| `dynamic_ name forEach` | Creates a Terraform `dynamic` block.  The computation-expression
+ body becomes the inner `content` block automatically. |
+| `error_message value` | Creates an `error_message` string attribute. |
+| `for_each value` | Creates a `for_each` meta-argument. |
+| `from_ value` | Creates a Terraform `from` expression attribute, used by `moved` and `removed`. |
+| `id value` | Creates a Terraform import `id` attribute. |
+| `ignore_changes refs` | `ignore_changes = [ref, ...]` inside a `lifecycle` block. |
+| `ignore_changes_all` | `ignore_changes = all` inside a `lifecycle` block. |
+| `import_` | Creates a Terraform `import` block. |
+| `lifecycle` | Creates a `lifecycle` block. |
+| `locals` | Creates a Terraform `locals` block. |
+| `module_ name` | Creates a Terraform `module` block. |
+| `move_` | Alias for `moved_`, useful when callers use the shorter term "move". |
+| `moved_` | Creates a Terraform `moved` block. |
+| `nullable value` | Creates a `nullable` boolean attribute. |
+| `output name` | Creates a Terraform `output` block. |
+| `postcondition` | Creates a `postcondition` block (used in `lifecycle`). |
+| `precondition` | Creates a `precondition` block (used in `lifecycle`, `output`, etc.). |
+| `prevent_destroy value` | `prevent_destroy = true/false` inside a `lifecycle` block. |
+| `provider name` | Creates a Terraform `provider` block. |
+| `provider_ ref` | Creates a `provider` meta-argument reference (e.g. `provider = aws.west`). |
+| `provisioner typeName` | Creates a `provisioner` block (e.g. `provisioner "local-exec" { ... }`). |
+| `removed_` | Creates a Terraform `removed` block. |
+| `replace_triggered_by refs` | `replace_triggered_by = [ref, ...]` inside a `lifecycle` block. |
+| `required_providers` | Creates a `required_providers` block inside a `terraform` block. |
+| `required_version value` | Creates a `required_version` attribute inside a `terraform` block. |
+| `resource typeName name` | Creates a Terraform `resource` block. |
+| `sensitive value` | Creates a `sensitive` boolean attribute. |
+| `terraform` | Creates a Terraform `terraform` block. |
+| `to_ value` | Creates a Terraform `to` expression attribute, used by `import` and `moved`. |
+| `type_ value` | Creates a `type` attribute (e.g. `type = string`).  Pass the HCL
+ type expression as a raw string. |
+| `validation` | Creates a `validation` block inside a variable block. |
+| `value_ value` | Creates a `value` attribute for an output block. |
+| `variable name` | Creates a Terraform `variable` block. |
+
+## backend
+
+```fsharp
+backend name
+```
+
+Creates a `backend` block inside a `terraform` block (e.g. `backend "s3" { ... }`).
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## check
+
+```fsharp
+check name
+```
+
+Creates a Terraform `check` block.
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## cloud
+
+```fsharp
+cloud
+```
+
+Creates a `cloud` block inside a `terraform` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## condition_
+
+```fsharp
+condition_ value
+```
+
+Creates a `condition` attribute (used in `validation`, `precondition`, etc.).
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## connection
+
+```fsharp
+connection
+```
+
+Creates a `connection` block inside a resource or provisioner.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## count
+
+```fsharp
+count value
+```
+
+Creates a `count` meta-argument.
+
+**Parameters**
+
+- `value` : `Value`
+
+**Returns** `Node`
+
+---
+
+## create_before_destroy
+
+```fsharp
+create_before_destroy value
+```
+
+`create_before_destroy = true/false` inside a `lifecycle` block.
+
+**Parameters**
+
+- `value` : `bool`
+
+**Returns** `Node`
+
+---
+
+## data
+
+```fsharp
+data sourceName name
+```
+
+Creates a Terraform `data` block.
+
+**Parameters**
+
+- `sourceName` : `string`
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## default_
+
+```fsharp
+default_ value
+```
+
+Creates a `default` attribute for a variable block.
+
+**Parameters**
+
+- `value` : `Value`
+
+**Returns** `Node`
+
+---
+
+## depends_on
+
+```fsharp
+depends_on refs
+```
+
+Creates a `depends_on` meta-argument from a list of references.
+
+**Parameters**
+
+- `refs` : `string list`
+
+**Returns** `Node`
+
+---
+
+## description
+
+```fsharp
+description value
+```
+
+Creates a `description` string attribute.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## dynamicWithIterator
+
+```fsharp
+dynamicWithIterator name forEach iterator
+```
+
+Creates a Terraform `dynamic` block with a custom `iterator` name.
+
+**Parameters**
+
+- `name` : `string`
+- `forEach` : `string`
+- `iterator` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## dynamic_
+
+```fsharp
+dynamic_ name forEach
+```
+
+Creates a Terraform `dynamic` block.  The computation-expression
+ body becomes the inner `content` block automatically.
+
+**Parameters**
+
+- `name` : `string`
+- `forEach` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## error_message
+
+```fsharp
+error_message value
+```
+
+Creates an `error_message` string attribute.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## for_each
+
+```fsharp
+for_each value
+```
+
+Creates a `for_each` meta-argument.
+
+**Parameters**
+
+- `value` : `Value`
+
+**Returns** `Node`
+
+---
+
+## from_
+
+```fsharp
+from_ value
+```
+
+Creates a Terraform `from` expression attribute, used by `moved` and `removed`.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## id
+
+```fsharp
+id value
+```
+
+Creates a Terraform import `id` attribute.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## ignore_changes
+
+```fsharp
+ignore_changes refs
+```
+
+`ignore_changes = [ref, ...]` inside a `lifecycle` block.
+
+**Parameters**
+
+- `refs` : `string list`
+
+**Returns** `Node`
+
+---
+
+## ignore_changes_all
+
+```fsharp
+ignore_changes_all
+```
+
+`ignore_changes = all` inside a `lifecycle` block.
+
+**Returns** `Node`
+
+---
+
+## import_
+
+```fsharp
+import_
+```
+
+Creates a Terraform `import` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## lifecycle
+
+```fsharp
+lifecycle
+```
+
+Creates a `lifecycle` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## locals
+
+```fsharp
+locals
+```
+
+Creates a Terraform `locals` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## module_
+
+```fsharp
+module_ name
+```
+
+Creates a Terraform `module` block.
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## move_
+
+```fsharp
+move_
+```
+
+Alias for `moved_`, useful when callers use the shorter term "move".
+
+**Returns** `ContainerBuilder`
+
+---
+
+## moved_
+
+```fsharp
+moved_
+```
+
+Creates a Terraform `moved` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## nullable
+
+```fsharp
+nullable value
+```
+
+Creates a `nullable` boolean attribute.
+
+**Parameters**
+
+- `value` : `bool`
+
+**Returns** `Node`
+
+---
+
+## output
+
+```fsharp
+output name
+```
+
+Creates a Terraform `output` block.
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## postcondition
+
+```fsharp
+postcondition
+```
+
+Creates a `postcondition` block (used in `lifecycle`).
+
+**Returns** `ContainerBuilder`
+
+---
+
+## precondition
+
+```fsharp
+precondition
+```
+
+Creates a `precondition` block (used in `lifecycle`, `output`, etc.).
+
+**Returns** `ContainerBuilder`
+
+---
+
+## prevent_destroy
+
+```fsharp
+prevent_destroy value
+```
+
+`prevent_destroy = true/false` inside a `lifecycle` block.
+
+**Parameters**
+
+- `value` : `bool`
+
+**Returns** `Node`
+
+---
+
+## provider
+
+```fsharp
+provider name
+```
+
+Creates a Terraform `provider` block.
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## provider_
+
+```fsharp
+provider_ ref
+```
+
+Creates a `provider` meta-argument reference (e.g. `provider = aws.west`).
+
+**Parameters**
+
+- `ref` : `string`
+
+**Returns** `Node`
+
+---
+
+## provisioner
+
+```fsharp
+provisioner typeName
+```
+
+Creates a `provisioner` block (e.g. `provisioner "local-exec" { ... }`).
+
+**Parameters**
+
+- `typeName` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## removed_
+
+```fsharp
+removed_
+```
+
+Creates a Terraform `removed` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## replace_triggered_by
+
+```fsharp
+replace_triggered_by refs
+```
+
+`replace_triggered_by = [ref, ...]` inside a `lifecycle` block.
+
+**Parameters**
+
+- `refs` : `string list`
+
+**Returns** `Node`
+
+---
+
+## required_providers
+
+```fsharp
+required_providers
+```
+
+Creates a `required_providers` block inside a `terraform` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## required_version
+
+```fsharp
+required_version value
+```
+
+Creates a `required_version` attribute inside a `terraform` block.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## resource
+
+```fsharp
+resource typeName name
+```
+
+Creates a Terraform `resource` block.
+
+**Parameters**
+
+- `typeName` : `string`
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## sensitive
+
+```fsharp
+sensitive value
+```
+
+Creates a `sensitive` boolean attribute.
+
+**Parameters**
+
+- `value` : `bool`
+
+**Returns** `Node`
+
+---
+
+## terraform
+
+```fsharp
+terraform
+```
+
+Creates a Terraform `terraform` block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## to_
+
+```fsharp
+to_ value
+```
+
+Creates a Terraform `to` expression attribute, used by `import` and `moved`.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## type_
+
+```fsharp
+type_ value
+```
+
+Creates a `type` attribute (e.g. `type = string`).  Pass the HCL
+ type expression as a raw string.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+
+---
+
+## validation
+
+```fsharp
+validation
+```
+
+Creates a `validation` block inside a variable block.
+
+**Returns** `ContainerBuilder`
+
+---
+
+## value_
+
+```fsharp
+value_ value
+```
+
+Creates a `value` attribute for an output block.
+
+**Parameters**
+
+- `value` : `Value`
+
+**Returns** `Node`
+
+---
+
+## variable
+
+```fsharp
+variable name
+```
+
+Creates a Terraform `variable` block.
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+

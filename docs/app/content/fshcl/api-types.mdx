@@ -1,0 +1,101 @@
+---
+title: "Types"
+description: "Core HCL types: Value, Node, Expr, RenderOptions."
+namespace: "FsHcl.Hcl"
+showTitle: false
+---
+
+# Value
+
+A value that can appear on the right-hand side of an HCL attribute.
+
+## Union cases
+
+| Name | Description |
+| --- | --- |
+| `Bool bool` |  |
+| `Conditional(condition, trueExpr, falseExpr)` |  |
+| `ForObject(keyVar, valueVar, collection, keyExpr, valueExpr, grouping, condition)` |  |
+| `ForTuple(variable, collection, expr, condition)` |  |
+| `FunctionCall(name, arguments)` |  |
+| `Heredoc(delimiter, content, indented)` |  |
+| `List Value list` |  |
+| `Null` |  |
+| `Number string` |  |
+| `Object (string * Value) list` |  |
+| `Raw string` |  |
+| `String string` |  |
+| `TemplateString string` |  |
+
+## Instance members
+
+| Name | Description |
+| --- | --- |
+| `this.IsBool` |  |
+| `this.IsConditional` |  |
+| `this.IsForObject` |  |
+| `this.IsForTuple` |  |
+| `this.IsFunctionCall` |  |
+| `this.IsHeredoc` |  |
+| `this.IsList` |  |
+| `this.IsNull` |  |
+| `this.IsNumber` |  |
+| `this.IsObject` |  |
+| `this.IsRaw` |  |
+| `this.IsString` |  |
+| `this.IsTemplateString` |  |
+
+---
+
+# Node
+
+A renderable HCL syntax node.
+
+## Union cases
+
+| Name | Description |
+| --- | --- |
+| `Attribute(key, value)` |  |
+| `Blank` |  |
+| `Block(name, labels, body)` |  |
+| `BlockComment string list` |  |
+| `Empty` |  |
+| `LineComment string` |  |
+| `ListAssignment(name, values)` |  |
+| `ObjectAssignment(name, body)` |  |
+| `RawLine string` |  |
+
+## Instance members
+
+| Name | Description |
+| --- | --- |
+| `this.IsAttribute` |  |
+| `this.IsBlank` |  |
+| `this.IsBlock` |  |
+| `this.IsBlockComment` |  |
+| `this.IsEmpty` |  |
+| `this.IsLineComment` |  |
+| `this.IsListAssignment` |  |
+| `this.IsObjectAssignment` |  |
+| `this.IsRawLine` |  |
+
+---
+
+# Expr
+
+Wrapper for values that should be rendered as raw HCL expressions.
+
+---
+
+# RenderOptions
+
+Rendering controls for generated HCL.
+
+## Record fields
+
+| Name | Description |
+| --- | --- |
+| `alignAttributes` |  |
+| `indentSize` |  |
+| `trailingNewline` |  |
+

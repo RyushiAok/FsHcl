@@ -4,16 +4,17 @@
   "tools": {
     "fantomas": {
       "version": "7.0.5",
-      "commands": [
-        "fantomas"
-      ],
+      "commands": ["fantomas"],
       "rollForward": false
     },
     "fsdocs-tool": {
       "version": "22.1.0",
-      "commands": [
-        "fsdocs"
-      ],
+      "commands": ["fsdocs"],
+      "rollForward": false
+    },
+    "fslangmcp": {
+      "version": "0.13.2",
+      "commands": ["fslangmcp"],
       "rollForward": false
     }
   }

@@ -1,0 +1,175 @@
+---
+title: "Syntax"
+description: "HCL block and attribute builder functions."
+namespace: "FsHcl.Hcl"
+---
+
+Computation expressions and constructors for HCL syntax nodes.
+
+| Function | Description |
+| --- | --- |
+| `attr key value` | Creates an HCL attribute. |
+| `blank` | Creates a blank line. |
+| `block name labels` | Creates an HCL block with optional labels. |
+| `blockComment lines` | Creates a block comment (`/* ... */`). |
+| `comment text` | Creates a line comment (`# ...`). |
+| `hcl` | HCL document computation expression. |
+| `list_ name values` | Creates a list assignment, for example `patterns = [ str "a"; str "b" ]`. |
+| `object_ name` | Creates an object assignment, for example `variables = { ... }`. |
+| `optAttr key _arg1` | Creates an optional HCL attribute, omitted when `None`. |
+| `rawLine value` | Creates an unparsed HCL line. |
+
+## attr
+
+```fsharp
+attr key value
+```
+
+Creates an HCL attribute.
+
+**Parameters**
+
+- `key` : `string`
+- `value` : `Value`
+
+**Returns** `Node`
+
+---
+
+## blank
+
+```fsharp
+blank
+```
+
+Creates a blank line.
+
+**Returns** `Node`
+
+---
+
+## block
+
+```fsharp
+block name labels
+```
+
+Creates an HCL block with optional labels.
+
+**Parameters**
+
+- `name` : `string`
+- `labels` : `string list`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## blockComment
+
+```fsharp
+blockComment lines
+```
+
+Creates a block comment (`/* ... */`).
+
+**Parameters**
+
+- `lines` : `string list`
+
+**Returns** `Node`
+
+---
+
+## comment
+
+```fsharp
+comment text
+```
+
+Creates a line comment (`# ...`).
+
+**Parameters**
+
+- `text` : `string`
+
+**Returns** `Node`
+
+---
+
+## hcl
+
+```fsharp
+hcl
+```
+
+HCL document computation expression.
+
+**Returns** `BodyBuilder`
+
+---
+
+## list_
+
+```fsharp
+list_ name values
+```
+
+Creates a list assignment, for example `patterns = [ str "a"; str "b" ]`.
+
+**Parameters**
+
+- `name` : `string`
+- `values` : `Value seq`
+
+**Returns** `Node`
+
+---
+
+## object_
+
+```fsharp
+object_ name
+```
+
+Creates an object assignment, for example `variables = { ... }`.
+
+**Parameters**
+
+- `name` : `string`
+
+**Returns** `ContainerBuilder`
+
+---
+
+## optAttr
+
+```fsharp
+optAttr key _arg1
+```
+
+Creates an optional HCL attribute, omitted when `None`.
+
+**Parameters**
+
+- `key` : `string`
+- `_arg1` : `Value option`
+
+**Returns** `Node`
+
+---
+
+## rawLine
+
+```fsharp
+rawLine value
+```
+
+Creates an unparsed HCL line.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Node`
+

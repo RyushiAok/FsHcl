@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/FsHcl.svg)](https://www.nuget.org/packages/FsHcl)
 
 **FsHcl** generates HCL (HashiCorp Configuration Language) code from F#.
-You write Terraform configurations with full type safety. FsHcl renders them to `.tf` files.
+The library renders Terraform configurations to `.tf` files.
 
 ## Features
 
@@ -32,11 +32,11 @@ hcl {
 
 ## Documentation
 
-Read the full documentation at <https://ryushiaok.github.io/FsHcl/>.
+Documentation is at <https://ryushiaok.github.io/FsHcl/>.
 
 ## Examples
 
-See [examples/HelloLambda](examples/HelloLambda) for a complete working example.
+[examples/HelloLambda](examples/HelloLambda) is a complete working example.
 
 ## License
 

@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Install FsHcl and generate your first Terraform resource.
+description: Install FsHcl and generate a Terraform resource.
 ---
 
 ## Prerequisites
@@ -9,7 +9,7 @@ description: Install FsHcl and generate your first Terraform resource.
 
 ## Step 1: Add the Package
 
-Run this command in your project directory:
+Run this command in the project directory:
 
 ```bash
 dotnet add package FsHcl
@@ -17,7 +17,7 @@ dotnet add package FsHcl
 
 ## Step 2: Open the Namespaces
 
-Add these `open` declarations at the top of your F# file:
+Add these `open` declarations at the top of the F# file:
 
 ```fsharp
 open FsHcl.Hcl
@@ -59,7 +59,7 @@ let hclText = config |> document
 printfn "%s" hclText
 ```
 
-This prints:
+Output:
 
 ```hcl
 resource "aws_s3_bucket" "my_bucket" {
@@ -82,11 +82,11 @@ open System.IO
 File.WriteAllText("main.tf", config |> document)
 ```
 
-Terraform reads this file directly. No extra build step is necessary.
+Terraform reads this file directly. A build step is not required.
 
 ## Next Steps
 
-- [Values](/values) — Learn all available value types
-- [Syntax](/syntax) — Learn about blocks, attributes, and render options
-- [Terraform Helpers](/terraform) — See Terraform-specific block builders
-- [Patterns](/patterns) — Define project-specific helper functions
+- [Values](/values) — All available value types
+- [Syntax](/syntax) — Blocks, attributes, and render options
+- [Terraform Helpers](/terraform) — Terraform-specific block builders
+- [Patterns](/patterns) — Project-specific helper functions

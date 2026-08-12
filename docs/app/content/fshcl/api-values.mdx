@@ -1,0 +1,488 @@
+---
+title: "Values"
+description: "Value constructors and conversion functions."
+namespace: "FsHcl.Hcl"
+---
+
+HCL value constructors and conversions.
+
+| Function | Description |
+| --- | --- |
+| `bool value` | Creates an HCL boolean value. |
+| `boolField key value` | Creates a boolean object field. |
+| `call name arguments` | Creates an HCL function call expression. |
+| `conditional condition trueExpr falseExpr` | Creates a conditional expression value. |
+| `escapeString value` | Escapes a string for use as an HCL string literal. |
+| `expr value` | Marks a string as a raw HCL expression when converting CLR or F# values. |
+| `field key value` | Creates an object field. |
+| `forObject keyVar valueVar collection keyExpr valueExpr` | Creates a for-object expression value, for example `{for k, v in map : k => v}`. |
+| `forObjectGroup keyVar valueVar collection keyExpr valueExpr` | Creates a for-object expression value with grouping mode (`...`). |
+| `forObjectIf keyVar valueVar collection keyExpr valueExpr condition` | Creates a for-object expression value with a condition filter. |
+| `forTuple variable collection expr` | Creates a for-tuple expression value, for example `[for v in list : v.id]`. |
+| `forTupleIf variable collection expr condition` | Creates a for-tuple expression value with a condition filter. |
+| `heredoc delimiter content` | Creates a heredoc string value. |
+| `heredocIndent delimiter content` | Creates an indented heredoc string value (`<<-` syntax). |
+| `jsonencode value` | Creates a Terraform `jsonencode(...)` expression from a CLR or F# value. |
+| `null_` | Creates an HCL null value. |
+| `number value` | Creates an HCL number value from a CLR numeric value. |
+| `numberField key value` | Creates a number object field. |
+| `obj` | HCL object value computation expression. |
+| `objField key` | Creates an object-valued field with a computation expression. |
+| `ofRecord record` | Converts a record into an HCL object value. |
+| `ofValue value` | Converts a record, primitive value, sequence, dictionary, or `Expr` into an HCL value. |
+| `raw value` | Creates a raw HCL expression value. |
+| `rawField key value` | Creates a raw expression object field. |
+| `str value` | Creates an HCL string value. |
+| `stringField key value` | Creates a string object field. |
+| `templateStr value` | Creates a template string value (preserves `${...}` interpolation sequences). |
+
+## bool
+
+```fsharp
+bool value
+```
+
+Creates an HCL boolean value.
+
+**Parameters**
+
+- `value` : `bool`
+
+**Returns** `Value`
+
+---
+
+## boolField
+
+```fsharp
+boolField key value
+```
+
+Creates a boolean object field.
+
+**Parameters**
+
+- `key` : `'a`
+- `value` : `bool`
+
+**Returns** `'a * Value`
+
+---
+
+## call
+
+```fsharp
+call name arguments
+```
+
+Creates an HCL function call expression.
+
+**Parameters**
+
+- `name` : `string`
+- `arguments` : `Value list`
+
+**Returns** `Value`
+
+---
+
+## conditional
+
+```fsharp
+conditional condition trueExpr falseExpr
+```
+
+Creates a conditional expression value.
+
+**Parameters**
+
+- `condition` : `string`
+- `trueExpr` : `string`
+- `falseExpr` : `string`
+
+**Returns** `Value`
+
+---
+
+## escapeString
+
+```fsharp
+escapeString value
+```
+
+Escapes a string for use as an HCL string literal.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `string`
+
+---
+
+## expr
+
+```fsharp
+expr value
+```
+
+Marks a string as a raw HCL expression when converting CLR or F# values.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Expr`
+
+---
+
+## field
+
+```fsharp
+field key value
+```
+
+Creates an object field.
+
+**Parameters**
+
+- `key` : `'a`
+- `value` : `'b`
+
+**Returns** `'a * 'b`
+
+---
+
+## forObject
+
+```fsharp
+forObject keyVar valueVar collection keyExpr valueExpr
+```
+
+Creates a for-object expression value, for example `{for k, v in map : k => v}`.
+
+**Parameters**
+
+- `keyVar` : `string`
+- `valueVar` : `string`
+- `collection` : `string`
+- `keyExpr` : `string`
+- `valueExpr` : `string`
+
+**Returns** `Value`
+
+---
+
+## forObjectGroup
+
+```fsharp
+forObjectGroup keyVar valueVar collection keyExpr valueExpr
+```
+
+Creates a for-object expression value with grouping mode (`...`).
+
+**Parameters**
+
+- `keyVar` : `string`
+- `valueVar` : `string`
+- `collection` : `string`
+- `keyExpr` : `string`
+- `valueExpr` : `string`
+
+**Returns** `Value`
+
+---
+
+## forObjectIf
+
+```fsharp
+forObjectIf keyVar valueVar collection keyExpr valueExpr condition
+```
+
+Creates a for-object expression value with a condition filter.
+
+**Parameters**
+
+- `keyVar` : `string`
+- `valueVar` : `string`
+- `collection` : `string`
+- `keyExpr` : `string`
+- `valueExpr` : `string`
+- `condition` : `string`
+
+**Returns** `Value`
+
+---
+
+## forTuple
+
+```fsharp
+forTuple variable collection expr
+```
+
+Creates a for-tuple expression value, for example `[for v in list : v.id]`.
+
+**Parameters**
+
+- `variable` : `string`
+- `collection` : `string`
+- `expr` : `string`
+
+**Returns** `Value`
+
+---
+
+## forTupleIf
+
+```fsharp
+forTupleIf variable collection expr condition
+```
+
+Creates a for-tuple expression value with a condition filter.
+
+**Parameters**
+
+- `variable` : `string`
+- `collection` : `string`
+- `expr` : `string`
+- `condition` : `string`
+
+**Returns** `Value`
+
+---
+
+## heredoc
+
+```fsharp
+heredoc delimiter content
+```
+
+Creates a heredoc string value.
+
+**Parameters**
+
+- `delimiter` : `string`
+- `content` : `string`
+
+**Returns** `Value`
+
+---
+
+## heredocIndent
+
+```fsharp
+heredocIndent delimiter content
+```
+
+Creates an indented heredoc string value (`<<-` syntax).
+
+**Parameters**
+
+- `delimiter` : `string`
+- `content` : `string`
+
+**Returns** `Value`
+
+---
+
+## jsonencode
+
+```fsharp
+jsonencode value
+```
+
+Creates a Terraform `jsonencode(...)` expression from a CLR or F# value.
+
+**Parameters**
+
+- `value` : `'a`
+
+**Returns** `Value`
+
+---
+
+## null_
+
+```fsharp
+null_
+```
+
+Creates an HCL null value.
+
+**Returns** `Value`
+
+---
+
+## number
+
+```fsharp
+number value
+```
+
+Creates an HCL number value from a CLR numeric value.
+
+**Parameters**
+
+- `value` : `'a`
+
+**Returns** `Value`
+
+---
+
+## numberField
+
+```fsharp
+numberField key value
+```
+
+Creates a number object field.
+
+**Parameters**
+
+- `key` : `'a`
+- `value` : `'b`
+
+**Returns** `'a * Value`
+
+---
+
+## obj
+
+```fsharp
+obj
+```
+
+HCL object value computation expression.
+
+**Returns** `ObjectBuilder`
+
+---
+
+## objField
+
+```fsharp
+objField key
+```
+
+Creates an object-valued field with a computation expression.
+
+**Parameters**
+
+- `key` : `string`
+
+**Returns** `ObjectFieldBuilder`
+
+---
+
+## ofRecord
+
+```fsharp
+ofRecord record
+```
+
+Converts a record into an HCL object value.
+
+**Parameters**
+
+- `record` : `'a`
+
+**Returns** `Value`
+
+---
+
+## ofValue
+
+```fsharp
+ofValue value
+```
+
+Converts a record, primitive value, sequence, dictionary, or `Expr` into an HCL value.
+
+**Parameters**
+
+- `value` : `'a`
+
+**Returns** `Value`
+
+---
+
+## raw
+
+```fsharp
+raw value
+```
+
+Creates a raw HCL expression value.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Value`
+
+---
+
+## rawField
+
+```fsharp
+rawField key value
+```
+
+Creates a raw expression object field.
+
+**Parameters**
+
+- `key` : `'a`
+- `value` : `string`
+
+**Returns** `'a * Value`
+
+---
+
+## str
+
+```fsharp
+str value
+```
+
+Creates an HCL string value.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Value`
+
+---
+
+## stringField
+
+```fsharp
+stringField key value
+```
+
+Creates a string object field.
+
+**Parameters**
+
+- `key` : `'a`
+- `value` : `string`
+
+**Returns** `'a * Value`
+
+---
+
+## templateStr
+
+```fsharp
+templateStr value
+```
+
+Creates a template string value (preserves `${...}` interpolation sequences).
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `Value`
+
