@@ -55,7 +55,7 @@ module Render =
         match value with
         | Null -> "null"
         | String value -> $"\"{escapeString value}\""
-        | TemplateString value -> $"\"{value}\""
+        | TemplateString value -> $"\"{escapeTemplateString value}\""
         | Bool true -> "true"
         | Bool false -> "false"
         | Number value -> value
@@ -148,8 +148,7 @@ module Render =
             | values ->
                 let body =
                     values
-                    |> List.map (fun value ->
-                        $"{padding childIndent}{renderValueAt options childIndent value},")
+                    |> List.map (fun value -> $"{padding childIndent}{renderValueAt options childIndent value},")
 
                 [ $"{pad}{name} = [" ] @ body @ [ $"{pad}]" ]
         | LineComment text -> [ $"{pad}# {text}" ]

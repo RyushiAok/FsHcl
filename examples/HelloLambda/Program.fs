@@ -163,6 +163,7 @@ let helloLambdaTf =
             statement {
                 effect "Allow"
                 actions [ "sts:AssumeRole" ]
+
                 principals {
                     string "type" "Service"
                     identifiers [ str "lambda.amazonaws.com" ]
@@ -219,7 +220,9 @@ let helloLambdaTf =
             depends_on [ "aws_lambda_function_url.hello_lambda" ]
         }
 
-        output "hello_lambda_github_actions_deploy_role_arn" { value_ (raw "aws_iam_role.hello_lambda_github_actions_deploy.arn") }
+        output "hello_lambda_github_actions_deploy_role_arn" {
+            value_ (raw "aws_iam_role.hello_lambda_github_actions_deploy.arn")
+        }
 
         output "hello_lambda_execution_role_arn" { value_ (raw "aws_iam_role.hello_lambda_execution.arn") }
 

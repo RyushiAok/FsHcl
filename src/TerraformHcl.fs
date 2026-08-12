@@ -11,12 +11,10 @@ module TerraformHcl =
     let provider name = block "provider" [ name ]
 
     /// Creates a Terraform `resource` block.
-    let resource typeName name =
-        block "resource" [ typeName; name ]
+    let resource typeName name = block "resource" [ typeName; name ]
 
     /// Creates a Terraform `data` block.
-    let data sourceName name =
-        block "data" [ sourceName; name ]
+    let data sourceName name = block "data" [ sourceName; name ]
 
     /// Creates a Terraform `variable` block.
     let variable name = block "variable" [ name ]
@@ -62,12 +60,7 @@ module TerraformHcl =
     /// body becomes the inner `content` block automatically.
     let dynamic_ name forEach =
         ContainerBuilder(fun body ->
-            Block(
-                "dynamic",
-                [ name ],
-                [ Attribute("for_each", Raw forEach)
-                  Block("content", [], body) ]
-            ))
+            Block("dynamic", [ name ], [ Attribute("for_each", Raw forEach); Block("content", [], body) ]))
 
     /// Creates a Terraform `dynamic` block with a custom `iterator` name.
     let dynamicWithIterator name forEach iterator =
@@ -75,9 +68,11 @@ module TerraformHcl =
             Block(
                 "dynamic",
                 [ name ],
-                [ Attribute("for_each", Raw forEach)
-                  Attribute("iterator", Raw iterator)
-                  Block("content", [], body) ]
+                [
+                    Attribute("for_each", Raw forEach)
+                    Attribute("iterator", Raw iterator)
+                    Block("content", [], body)
+                ]
             ))
 
     // ---------------------------------------------------------------
@@ -98,8 +93,7 @@ module TerraformHcl =
     let provider_ ref = attr "provider" (raw ref)
 
     /// Creates a `provisioner` block (e.g. `provisioner "local-exec" { ... }`).
-    let provisioner typeName =
-        block "provisioner" [ typeName ]
+    let provisioner typeName = block "provisioner" [ typeName ]
 
     /// Creates a `connection` block inside a resource or provisioner.
     let connection = block "connection" []
@@ -116,8 +110,7 @@ module TerraformHcl =
         attr "create_before_destroy" (bool value)
 
     /// `prevent_destroy = true/false` inside a `lifecycle` block.
-    let prevent_destroy value =
-        attr "prevent_destroy" (bool value)
+    let prevent_destroy value = attr "prevent_destroy" (bool value)
 
     /// `ignore_changes = [ref, ...]` inside a `lifecycle` block.
     let ignore_changes refs =

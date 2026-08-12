@@ -2,6 +2,7 @@ namespace FsHcl.Hcl
 
 open System
 open System.Collections
+open System.Collections.Generic
 open System.Globalization
 open System.Reflection
 open Microsoft.FSharp.Reflection
@@ -24,6 +25,10 @@ module Values =
             .Replace("\t", "\\t")
             .Replace("${", "$${")
             .Replace("%{", "%%{")
+
+    /// Escapes a template string, preserving `${...}` and `%{...}` interpolation sequences.
+    let escapeTemplateString (value: string) =
+        value.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t")
 
     /// Creates an HCL string value.
     let str value = Value.String value
@@ -69,12 +74,22 @@ module Values =
     /// Creates a template string value (preserves `${...}` interpolation sequences).
     let templateStr value = Value.TemplateString value
 
+    let private validateHeredoc (delimiter: string) (content: string) =
+        if
+            content.Split('\n')
+            |> Array.exists (fun line -> line.Trim() = delimiter)
+        then
+            invalidArg (nameof delimiter) $"Content contains the delimiter '{delimiter}' on its own line"
+
     /// Creates a heredoc string value.
     let heredoc delimiter content =
+        validateHeredoc delimiter content
         Value.Heredoc(delimiter, content, false)
 
     /// Creates an indented heredoc string value (`<<-` syntax).
-    let heredocIndent delimiter content = Value.Heredoc(delimiter, content, true)
+    let heredocIndent delimiter content =
+        validateHeredoc delimiter content
+        Value.Heredoc(delimiter, content, true)
 
     /// Creates a conditional expression value.
     let conditional condition trueExpr falseExpr =
@@ -124,6 +139,41 @@ module Values =
             | key -> invalidArg (nameof values) $"HCL object keys must be strings, but got {key.GetType().FullName}")
         |> Seq.toList
 
+    let private isGenericDictionary (value: obj) =
+        value.GetType().GetInterfaces()
+        |> Array.exists (fun i ->
+            i.IsGenericType
+            && i.GetGenericTypeDefinition() = typedefof<IReadOnlyDictionary<_, _>>
+            && i.GetGenericArguments().[0] = typeof<string>)
+
+    let private genericDictionaryFields (value: obj) : (string * (obj | null)) list =
+        let iface =
+            value.GetType().GetInterfaces()
+            |> Array.find (fun i ->
+                i.IsGenericType
+                && i.GetGenericTypeDefinition() = typedefof<IReadOnlyDictionary<_, _>>
+                && i.GetGenericArguments().[0] = typeof<string>)
+
+        let enumerableType =
+            typedefof<IEnumerable<_>>
+                .MakeGenericType(typedefof<KeyValuePair<_, _>>.MakeGenericType(iface.GetGenericArguments()))
+
+        let enumerator =
+            enumerableType.GetMethod("GetEnumerator").Invoke(value, null) :?> IEnumerator
+
+        [
+            while enumerator.MoveNext() do
+                let kvp = enumerator.Current
+                let kvpType = kvp.GetType()
+                let key = kvpType.GetProperty("Key").GetValue(kvp) :?> string
+                let v: obj | null = kvpType.GetProperty("Value").GetValue(kvp)
+                yield key, v
+        ]
+
+    let private isOptionType (t: Type) =
+        t.IsGenericType
+        && t.GetGenericTypeDefinition() = typedefof<option<_>>
+
     let rec private valueOfObj (value: obj | null) : Value =
         match value with
         | null -> Value.Null
@@ -133,10 +183,21 @@ module Values =
             Value.Raw value
         | :? string as value -> Value.String value
         | :? bool as value -> Value.Bool value
+        | :? char as c -> Value.String(string c)
+        | :? (byte array) -> invalidArg (nameof value) "byte[] is not supported as an HCL value"
+        | value when isOptionType (value.GetType()) ->
+            let prop = value.GetType().GetProperty("Value")
+            let innerValue: obj | null = prop.GetValue(value)
+            valueOfObj innerValue
         | :? IDictionary as values ->
             values
             |> dictionaryFields
             |> List.map (fun (key, value) -> key, valueOfObj value)
+            |> Value.Object
+        | value when isGenericDictionary value ->
+            value
+            |> genericDictionaryFields
+            |> List.map (fun (key, v) -> key, valueOfObj v)
             |> Value.Object
         | :? IEnumerable as values ->
             values

@@ -189,6 +189,65 @@ module RenderTests =
             |> document
 
         result |> should haveSubstring "ami           = \"abc-123\""
-        result |> should haveSubstring "instance_type = \"t2.micro\""
-        result |> should haveSubstring "availability_zone = \"us-west-2a\""
-        result |> should haveSubstring "key_name          = \"my-key\""
+
+        result
+        |> should haveSubstring "instance_type = \"t2.micro\""
+
+        result
+        |> should haveSubstring "availability_zone = \"us-west-2a\""
+
+        result
+        |> should haveSubstring "key_name          = \"my-key\""
+
+    [<Fact>]
+    let ``template string escapes quotes`` () =
+        attr "msg" (templateStr """hello "world" ${var.name}""")
+        |> Render.node
+        |> should equal "msg = \"hello \\\"world\\\" ${var.name}\"\n"
+
+    [<Fact>]
+    let ``template string escapes backslash`` () =
+        attr "path" (templateStr """C:\Users\${var.user}""")
+        |> Render.node
+        |> should equal "path = \"C:\\\\Users\\\\${var.user}\"\n"
+
+    [<Fact>]
+    let ``ofValue converts Map to Object`` () =
+        let result =
+            attr "tags" (ofValue (Map [ ("Name", "example"); ("Env", "prod") ]))
+            |> Render.node
+
+        result |> should haveSubstring "Env  = \"prod\""
+        result |> should haveSubstring "Name = \"example\""
+
+    [<Fact>]
+    let ``ofValue converts Some to inner value`` () =
+        ofValue (Some "hello")
+        |> should equal (Value.String "hello")
+
+    [<Fact>]
+    let ``ofValue converts None to Null`` () =
+        ofValue (None: string option) |> should equal Value.Null
+
+    [<Fact>]
+    let ``ofValue converts nested option`` () =
+        ofValue (Some 42) |> should equal (Value.Number "42")
+
+    [<Fact>]
+    let ``ofValue converts char to String`` () =
+        ofValue 'x' |> should equal (Value.String "x")
+
+    [<Fact>]
+    let ``ofValue rejects byte array`` () =
+        (fun () -> ofValue [| 1uy; 2uy |] |> ignore)
+        |> should throw typeof<System.ArgumentException>
+
+    [<Fact>]
+    let ``heredoc rejects delimiter collision`` () =
+        (fun () -> heredoc "EOF" "line\nEOF\nmore" |> ignore)
+        |> should throw typeof<System.ArgumentException>
+
+    [<Fact>]
+    let ``heredocIndent rejects delimiter collision`` () =
+        (fun () -> heredocIndent "SCRIPT" "echo\n  SCRIPT\ndone" |> ignore)
+        |> should throw typeof<System.ArgumentException>

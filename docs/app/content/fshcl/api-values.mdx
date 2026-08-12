@@ -13,6 +13,7 @@ HCL value constructors and conversions.
 | `call name arguments` | Creates an HCL function call expression. |
 | `conditional condition trueExpr falseExpr` | Creates a conditional expression value. |
 | `escapeString value` | Escapes a string for use as an HCL string literal. |
+| `escapeTemplateString value` | Escapes a template string, preserving `${...}` and `%{...}` interpolation sequences. |
 | `expr value` | Marks a string as a raw HCL expression when converting CLR or F# values. |
 | `field key value` | Creates an object field. |
 | `forObject keyVar valueVar collection keyExpr valueExpr` | Creates a for-object expression value, for example `{for k, v in map : k => v}`. |
@@ -111,6 +112,22 @@ escapeString value
 ```
 
 Escapes a string for use as an HCL string literal.
+
+**Parameters**
+
+- `value` : `string`
+
+**Returns** `string`
+
+---
+
+## escapeTemplateString
+
+```fsharp
+escapeTemplateString value
+```
+
+Escapes a template string, preserving `${...}` and `%{...}` interpolation sequences.
 
 **Parameters**
 

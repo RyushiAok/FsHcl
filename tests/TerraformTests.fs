@@ -48,7 +48,10 @@ module TerraformHclTests =
         result |> should haveSubstring "dynamic \"ingress\" {"
         result |> should haveSubstring "for_each = var.rules"
         result |> should haveSubstring "content {"
-        result |> should haveSubstring "from_port = ingress.value.port"
+
+        result
+        |> should haveSubstring "from_port = ingress.value.port"
+
         result |> should haveSubstring "protocol  = \"tcp\""
 
     [<Fact>]
@@ -105,8 +108,13 @@ module TerraformHclTests =
             |> document
 
         result |> should haveSubstring "lifecycle {"
-        result |> should haveSubstring "create_before_destroy = true"
-        result |> should haveSubstring "prevent_destroy       = true"
+
+        result
+        |> should haveSubstring "create_before_destroy = true"
+
+        result
+        |> should haveSubstring "prevent_destroy       = true"
+
         result |> should haveSubstring "ignore_changes        = ["
         result |> should haveSubstring "tags,"
         result |> should haveSubstring "replace_triggered_by  = ["
@@ -114,11 +122,7 @@ module TerraformHclTests =
     [<Fact>]
     let ``lifecycle ignore_changes all`` () =
         let result =
-            hcl {
-                resource "aws_instance" "example" {
-                    lifecycle { ignore_changes_all }
-                }
-            }
+            hcl { resource "aws_instance" "example" { lifecycle { ignore_changes_all } } }
             |> document
 
         result |> should haveSubstring "ignore_changes = all"
@@ -144,10 +148,17 @@ module TerraformHclTests =
             |> document
 
         result |> should haveSubstring "precondition {"
-        result |> should haveSubstring "condition     = var.instance_type"
-        result |> should haveSubstring "error_message = \"instance_type must not be empty\""
+
+        result
+        |> should haveSubstring "condition     = var.instance_type"
+
+        result
+        |> should haveSubstring "error_message = \"instance_type must not be empty\""
+
         result |> should haveSubstring "postcondition {"
-        result |> should haveSubstring "error_message = \"must have a public IP\""
+
+        result
+        |> should haveSubstring "error_message = \"must have a public IP\""
 
     [<Fact>]
     let ``terraform sub-blocks render correctly`` () =
@@ -172,7 +183,10 @@ module TerraformHclTests =
             |> document
 
         result |> should haveSubstring "terraform {"
-        result |> should haveSubstring "required_version = \">= 1.6.0\""
+
+        result
+        |> should haveSubstring "required_version = \">= 1.6.0\""
+
         result |> should haveSubstring "required_providers {"
         result |> should haveSubstring "source  = \"hashicorp/aws\""
         result |> should haveSubstring "version = \"~> 5.0\""
@@ -217,14 +231,21 @@ module TerraformHclTests =
             }
             |> document
 
-        result |> should haveSubstring "variable \"instance_type\" {"
+        result
+        |> should haveSubstring "variable \"instance_type\" {"
+
         result |> should haveSubstring "type        = string"
         result |> should haveSubstring "default     = \"t3.micro\""
-        result |> should haveSubstring "description = \"EC2 instance type\""
+
+        result
+        |> should haveSubstring "description = \"EC2 instance type\""
+
         result |> should haveSubstring "sensitive   = false"
         result |> should haveSubstring "nullable    = false"
         result |> should haveSubstring "validation {"
-        result |> should haveSubstring "error_message = \"Must be t3.micro or t3.small.\""
+
+        result
+        |> should haveSubstring "error_message = \"Must be t3.micro or t3.small.\""
 
     [<Fact>]
     let ``output block with value and sensitive`` () =
@@ -239,8 +260,13 @@ module TerraformHclTests =
             |> document
 
         result |> should haveSubstring "output \"db_password\" {"
-        result |> should haveSubstring "value       = aws_db_instance.main.password"
-        result |> should haveSubstring "description = \"The database password\""
+
+        result
+        |> should haveSubstring "value       = aws_db_instance.main.password"
+
+        result
+        |> should haveSubstring "description = \"The database password\""
+
         result |> should haveSubstring "sensitive   = true"
 
     [<Fact>]
@@ -253,9 +279,7 @@ module TerraformHclTests =
                         attr "host" (raw "self.public_ip")
                     }
 
-                    provisioner "remote-exec" {
-                        attr "inline" (Value.List [ raw "echo hello" ])
-                    }
+                    provisioner "remote-exec" { attr "inline" (Value.List [ raw "echo hello" ]) }
                 }
             }
             |> document
@@ -263,4 +287,6 @@ module TerraformHclTests =
         result |> should haveSubstring "connection {"
         result |> should haveSubstring "type = \"ssh\""
         result |> should haveSubstring "host = self.public_ip"
-        result |> should haveSubstring "provisioner \"remote-exec\" {"
+
+        result
+        |> should haveSubstring "provisioner \"remote-exec\" {"
